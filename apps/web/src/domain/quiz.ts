@@ -65,7 +65,6 @@ export interface QuizOutcome {
 
 export interface PlayerBenchmark {
   betterThanPercent: number | null;
-  detail: string;
   label: string;
   shortLabel: string;
 }
@@ -192,7 +191,6 @@ export function buildPlayerBenchmark(
   if (performanceRatio === undefined || !Number.isFinite(performanceRatio)) {
     return {
       betterThanPercent: null,
-      detail: "Answer to compare.",
       label: "Benchmark pending",
       shortLabel: "Benchmark pending",
     };
@@ -209,7 +207,6 @@ export function buildPlayerBenchmark(
 
   return {
     betterThanPercent,
-    detail: "Local mock cohort.",
     label: `Better than ${betterThanPercent}% of players`,
     shortLabel: `Better than ${betterThanPercent}%`,
   };

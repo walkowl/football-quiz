@@ -30,7 +30,7 @@ describe("QuizExperience", () => {
       screen.getByRole("group", { name: "Question data status" }),
     ).toHaveTextContent("Mock week");
     expect(screen.getByTestId("feedback")).toHaveTextContent("Correct");
-    expect(screen.getByText("Better than 94%")).toBeInTheDocument();
+    expect(screen.getByText("This quiz: Better than 94%")).toBeInTheDocument();
     expect(screen.queryByText(/Score:/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Next question/ })).toBeEnabled();
   });
@@ -55,7 +55,9 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Advanced Fan" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Better than 94% of players")).toBeInTheDocument();
+    expect(
+      screen.getByText("This quiz: Better than 94% of players"),
+    ).toBeInTheDocument();
   });
 
   it("persists completed quiz progress and restores it on reload", () => {
@@ -207,7 +209,7 @@ describe("QuizExperience", () => {
       screen.getByRole("heading", { name: "Fan Profile" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByLabelText("Vs players Benchmark pending"),
+      screen.getByLabelText("Overall players Benchmark pending"),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Questions 0/3")).toBeInTheDocument();
     expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
@@ -235,6 +237,7 @@ describe("QuizExperience", () => {
       "Mock data",
     );
     expect(screen.getAllByText("Benchmark pending").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Overall: Benchmark pending/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Open Fan profile" }));
     expect(

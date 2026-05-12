@@ -339,7 +339,7 @@ export function QuizExperience() {
                     : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
                 </span>
                 <strong>00:14</strong>
-                <span>{playerBenchmark.shortLabel}</span>
+                <span>This quiz: {playerBenchmark.shortLabel}</span>
               </>
             ) : activeView === "leaderboard" ? (
               <>
@@ -663,7 +663,7 @@ function ResultCard({
   return (
     <section className="result-card" aria-label="Quiz result">
       <div className="result-topline">
-        <span className="score-pill">{playerBenchmark.label}</span>
+        <span className="score-pill">This quiz: {playerBenchmark.label}</span>
         <button
           aria-label="Try again"
           className="chrome-button"
@@ -823,18 +823,18 @@ function LocalHomeScreen({
           value={isComplete ? "Result" : "Play"}
         />
         <HomeShortcut
-          copy={`${profileSummary.playerBenchmark.label} / ${profileSummary.historyLabel}`}
+          copy={`Overall: ${profileSummary.playerBenchmark.label} / ${profileSummary.historyLabel}`}
           icon={User}
           label="Fan profile"
           onOpen={() => onNavigate("profile")}
-          value={profileSummary.level}
+          value="Profile"
         />
         <HomeShortcut
           copy={`${fixtureLabel} / ${savedPickLabel}`}
           icon={BarChart3}
           label="Score League"
           onOpen={() => onNavigate("leaderboard")}
-          value="Rewards locked"
+          value="League"
         />
       </section>
 
@@ -1177,7 +1177,7 @@ function LocalProfileScreen({
 
       <div className="profile-stat-grid" aria-label="Local profile stats">
         <ProfileStat
-          label="Vs players"
+          label="Overall players"
           value={profileSummary.playerBenchmark.shortLabel}
         />
         <ProfileStat

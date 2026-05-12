@@ -808,6 +808,7 @@ button {
   display: grid;
   width: 108px;
   min-height: 76px;
+  gap: 3px;
   place-items: center;
   border: 1px solid rgba(29, 184, 102, 0.34);
   border-radius: 14px;
@@ -815,6 +816,16 @@ button {
   color: #8cffbd;
   padding: 9px;
   text-align: center;
+}
+
+.home-hero-badge::before {
+  content: "Overall";
+  color: rgba(246, 244, 238, 0.62);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .home-hero-badge span {

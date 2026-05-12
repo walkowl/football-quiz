@@ -31,6 +31,8 @@ The first mobile viewport must show the relevant result information without maki
 
 Do not show meaningless score totals. Use a player-relative benchmark such as `Better than 74% of players`. During the local-only phase this can come from a mocked benchmark cohort, but the UI language and data model should be ready to replace it with a real user cohort later.
 
+When more than one benchmark appears, label the scope clearly. For example, use `This quiz` for the just-finished pack and `Overall` for the device profile/history benchmark.
+
 ## Media Rule
 
 Normal quiz content should expect a photo or image.

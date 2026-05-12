@@ -42,7 +42,6 @@ describe("quiz domain", () => {
 
     expect(compareQuizPerformanceWithPlayers(mockQuestions, answers)).toEqual({
       betterThanPercent: 94,
-      detail: "Local mock cohort.",
       label: "Better than 94% of players",
       shortLabel: "Better than 94%",
     });
