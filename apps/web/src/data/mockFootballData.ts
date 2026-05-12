@@ -117,7 +117,7 @@ export const firstRunQuizPack: QuizPack = {
 };
 
 export const weeklyPulseQuizPack: QuizPack = {
-  id: "mock-weekly-pulse",
+  id: "weekly-pulse",
   title: "Weekly Pulse",
   subtitle: "Local mock questions shaped like recent match and player data.",
   questions: [

@@ -18,7 +18,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { firstRunQuizPack, topicOptions } from "../../data/mockFootballData";
+import {
+  firstRunQuizPack,
+  localMockQuizPacks,
+  topicOptions,
+} from "../../data/mockFootballData";
 import {
   buildFanProfile,
   evaluateQuiz,
@@ -28,12 +32,17 @@ import {
   recommendationCopy,
   type AnswerMap,
   type QuizMedia,
+  type QuizPack,
   type QuizQuestion,
 } from "../../domain/quiz";
 
-const quizQuestions = firstRunQuizPack.questions;
+const localPackById = new Map(
+  localMockQuizPacks.map((pack) => [pack.id, pack]),
+);
+const localPackIds = new Set(localPackById.keys());
 
 export function QuizExperience() {
+  const [activePackId, setActivePackId] = useState(firstRunQuizPack.id);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [selectedTopics, setSelectedTopics] = useState<string[]>([
@@ -41,6 +50,8 @@ export function QuizExperience() {
     "transfers",
   ]);
 
+  const activePack = localPackById.get(activePackId) ?? firstRunQuizPack;
+  const quizQuestions = activePack.questions;
   const currentQuestion = quizQuestions[questionIndex];
   const selectedAnswer = currentQuestion
     ? answers[currentQuestion.id]
@@ -55,13 +66,19 @@ export function QuizExperience() {
 
   const outcome = useMemo(
     () => evaluateQuiz(quizQuestions, answers),
-    [answers],
+    [answers, quizQuestions],
   );
   const fanProfile = useMemo(
     () => buildFanProfile(quizQuestions, answers, selectedTopics),
-    [answers, selectedTopics],
+    [answers, quizQuestions, selectedTopics],
   );
   const score = outcome.weightedScore * 420;
+
+  function startPack(packId: string) {
+    setActivePackId(packId);
+    setQuestionIndex(0);
+    setAnswers({});
+  }
 
   function selectAnswer(optionId: string) {
     if (!currentQuestion || selectedAnswer) {
@@ -79,8 +96,7 @@ export function QuizExperience() {
   }
 
   function restart() {
-    setQuestionIndex(0);
-    setAnswers({});
+    startPack(activePack.id);
   }
 
   function toggleTopic(topicId: string) {
@@ -138,7 +154,7 @@ export function QuizExperience() {
           <div className="match-meta">
             <span>
               {isComplete
-                ? "Profile ready"
+                ? `${activePack.title} done`
                 : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
             </span>
             <strong>00:14</strong>
@@ -157,7 +173,10 @@ export function QuizExperience() {
             />
           ) : (
             <ResultCard
+              activePack={activePack}
+              localPackIds={localPackIds}
               onRestart={restart}
+              onStartPack={startPack}
               onToggleTopic={toggleTopic}
               profile={fanProfile}
               outcome={outcome}
@@ -300,18 +319,24 @@ export function QuestionMedia({
 }
 
 interface ResultCardProps {
+  activePack: QuizPack;
+  localPackIds: ReadonlySet<string>;
   outcome: ReturnType<typeof evaluateQuiz>;
   profile: ReturnType<typeof buildFanProfile>;
   selectedTopics: string[];
   onRestart: () => void;
+  onStartPack: (packId: string) => void;
   onToggleTopic: (topicId: string) => void;
 }
 
 function ResultCard({
+  activePack,
+  localPackIds,
   outcome,
   profile,
   selectedTopics,
   onRestart,
+  onStartPack,
   onToggleTopic,
 }: ResultCardProps) {
   const packs = recommendPacks(profile);
@@ -374,15 +399,33 @@ function ResultCard({
         <span>Next packs</span>
       </div>
       <div className="pack-list">
-        {packs.map((pack) => (
-          <article className="pack-row" key={pack.id}>
-            <div>
-              <h3>{pack.title}</h3>
-              <p>{pack.description}</p>
-            </div>
-            <span>{pack.freshness}</span>
-          </article>
-        ))}
+        {packs.map((pack) => {
+          const playable = localPackIds.has(pack.id);
+          const active = activePack.id === pack.id;
+
+          return (
+            <article className="pack-row" key={pack.id}>
+              <div>
+                <h3>{pack.title}</h3>
+                <p>{pack.description}</p>
+              </div>
+              {playable ? (
+                <button
+                  aria-label={`Start ${pack.title}`}
+                  className="pack-action"
+                  disabled={active}
+                  onClick={() => onStartPack(pack.id)}
+                  type="button"
+                >
+                  <Play aria-hidden="true" size={14} />
+                  <span>{active ? "Now" : "Play"}</span>
+                </button>
+              ) : (
+                <span className="pack-badge">{pack.freshness}</span>
+              )}
+            </article>
+          );
+        })}
       </div>
     </section>
   );

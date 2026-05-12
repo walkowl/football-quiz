@@ -30,6 +30,14 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   ).toBeVisible();
   await expect(page.getByLabel("Fan profile summary")).toContainText("100%");
   await expect(page.getByText("Next packs")).toBeVisible();
+
+  await page.getByRole("button", { name: "Start Weekly Pulse" }).tap();
+  await expect(
+    page.getByRole("heading", {
+      name: "Who won the featured derby in this week's local pulse?",
+    }),
+  ).toBeVisible();
+  await expect(page.getByText("Question 1/3")).toBeVisible();
 });
 
 test("home screen has no serious accessibility violations", async ({

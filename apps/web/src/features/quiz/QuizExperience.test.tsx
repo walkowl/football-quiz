@@ -34,6 +34,60 @@ describe("QuizExperience", () => {
     ).toBeInTheDocument();
   });
 
+  it("starts the local weekly pulse pack from the result screen", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Bayer Leverkusen" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "20-year-old elite winger" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Reveal profile/ }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Start Weekly Pulse" }));
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Who won the featured derby in this week's local pulse?",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("0% complete")).toBeInTheDocument();
+  });
+
+  it("restarts the active quiz and lets result topics be tuned", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Restart quiz" }));
+
+    expect(screen.getByTestId("feedback")).toHaveTextContent("Local mock data");
+    expect(
+      screen.getByRole("button", { name: /Next question/ }),
+    ).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Bayer Leverkusen" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "20-year-old elite winger" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Reveal profile/ }));
+
+    const transfersTopic = screen.getByRole("button", { name: /Transfers/ });
+    const marketValuesTopic = screen.getByRole("button", {
+      name: /Market values/,
+    });
+
+    fireEvent.click(transfersTopic);
+    expect(transfersTopic).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(marketValuesTopic);
+    expect(marketValuesTopic).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("renders a deliberate fallback when question media is missing", () => {
     render(<QuestionMedia category="Market value" />);
 

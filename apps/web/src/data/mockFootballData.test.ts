@@ -57,4 +57,8 @@ describe("mock football data", () => {
     );
     expect(allQuestions.some((question) => !question.media)).toBe(true);
   });
+
+  it("keeps the weekly pulse pack aligned with playable recommendations", () => {
+    expect(localMockQuizPacks.map((pack) => pack.id)).toContain("weekly-pulse");
+  });
 });
