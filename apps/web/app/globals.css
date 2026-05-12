@@ -284,7 +284,8 @@ button {
 }
 
 .quiz-card,
-.result-card {
+.result-card,
+.profile-screen {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -731,6 +732,189 @@ button {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(246, 244, 238, 0.52);
   cursor: default;
+}
+
+.profile-screen {
+  gap: 13px;
+  padding: 13px 0 10px;
+}
+
+.profile-topline {
+  flex: 0 0 auto;
+}
+
+.profile-pill {
+  gap: 6px;
+}
+
+.profile-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid rgba(217, 121, 55, 0.28);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(217, 121, 55, 0.16), transparent 58%),
+    rgba(255, 255, 255, 0.06);
+  padding: 13px;
+}
+
+.profile-hero p,
+.profile-hero h2 {
+  margin: 0;
+}
+
+.profile-hero p {
+  color: var(--amber);
+  font-size: 0.7rem;
+  font-weight: 880;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-hero h2 {
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 1.8rem;
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.profile-hero strong {
+  display: block;
+  margin-top: 8px;
+  color: rgba(246, 244, 238, 0.78);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.profile-badge {
+  display: grid;
+  width: 74px;
+  min-height: 74px;
+  place-items: center;
+  border: 1px solid rgba(29, 184, 102, 0.34);
+  border-radius: 14px;
+  background: rgba(29, 184, 102, 0.12);
+  color: #8cffbd;
+}
+
+.profile-badge span {
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.profile-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.profile-stat {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+  padding: 11px;
+}
+
+.profile-stat span {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 940;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-stat small {
+  color: rgba(246, 244, 238, 0.56);
+  font-size: 0.66rem;
+  font-weight: 790;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-section {
+  display: grid;
+  gap: 8px;
+}
+
+.signal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.signal-chip {
+  border: 1px solid rgba(29, 184, 102, 0.34);
+  border-radius: 999px;
+  background: rgba(29, 184, 102, 0.1);
+  color: #9dffc8;
+  font-size: 0.72rem;
+  font-weight: 850;
+  padding: 7px 9px;
+}
+
+.profile-pick-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(217, 121, 55, 0.24);
+  border-radius: 14px;
+  background: rgba(217, 121, 55, 0.08);
+  padding: 12px;
+}
+
+.profile-pick-card span,
+.profile-pick-card strong,
+.profile-pick-card p {
+  display: block;
+  margin: 0;
+}
+
+.profile-pick-card span {
+  color: var(--amber);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-pick-card strong {
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 1.12rem;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-pick-card p {
+  margin-top: 3px;
+  color: rgba(246, 244, 238, 0.58);
+  font-size: 0.7rem;
+  font-weight: 720;
+}
+
+.profile-pick-card svg {
+  color: #f5b36f;
+}
+
+.profile-pack-list {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 4px;
 }
 
 .prediction-screen {

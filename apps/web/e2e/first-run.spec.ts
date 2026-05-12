@@ -113,6 +113,35 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Leaderboard" })).toBeVisible();
 });
 
+test("profile tab summarizes local quiz and prediction state", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  await page.getByRole("button", { name: "Profile" }).tap();
+
+  await expect(
+    page.getByRole("heading", { name: "Fan Profile" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Questions 0/3")).toBeVisible();
+  await expect(page.getByLabel("Local prediction summary")).toContainText(
+    "No local pick saved",
+  );
+
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+  await page.getByLabel("Napoli score").fill("2");
+  await page.getByLabel("Inter score").fill("1");
+  await page.getByRole("button", { name: "Save prediction" }).tap();
+  await page.getByRole("button", { name: "Profile" }).tap();
+
+  await expect(page.getByLabel("Local prediction summary")).toContainText(
+    "NAP 2-1 INT",
+  );
+  await expect(page.getByLabel("Prediction pts 0")).toBeVisible();
+});
+
 test("home screen keeps the approved mobile visual direction", async ({
   page,
 }) => {

@@ -36,6 +36,7 @@ import {
 import {
   buildPredictionLeaderboard,
   getPredictionLockState,
+  type PredictionLeagueEntry,
   type PredictionFixture,
   type PredictionLockState,
   type ScoreLine,
@@ -49,7 +50,9 @@ import {
   recommendPacks,
   recommendationCopy,
   type AnswerMap,
+  type FanProfile,
   type QuizMedia,
+  type QuizOutcome,
   type QuizPack,
   type QuizQuestion,
 } from "../../domain/quiz";
@@ -78,7 +81,7 @@ const scheduledPredictionFixture = mockPredictionFixtures.find(
   (fixture) => fixture.status === "scheduled",
 );
 
-type AppView = "play" | "leaderboard";
+type AppView = "play" | "leaderboard" | "profile";
 type PredictionSaveState = "draft" | "saved" | "restored" | "unavailable";
 
 interface PredictionUiState {
@@ -126,6 +129,23 @@ export function QuizExperience() {
   const scheduledPredictionLockState = scheduledPredictionFixture
     ? getPredictionLockState(scheduledPredictionFixture, localPredictionClockAt)
     : undefined;
+  const predictionLeaderboard = useMemo(() => {
+    const predictions = predictionUi.savedPrediction
+      ? [...mockScorePredictions, predictionUi.savedPrediction]
+      : mockScorePredictions;
+    const members = predictionUi.savedPrediction
+      ? [...mockPredictionMembers, localPredictionMember]
+      : mockPredictionMembers;
+
+    return buildPredictionLeaderboard({
+      fixtures: mockPredictionFixtures,
+      members,
+      predictions,
+    });
+  }, [predictionUi.savedPrediction]);
+  const localPredictionEntry = predictionLeaderboard.find(
+    (entry) => entry.userId === localPredictionMember.userId,
+  );
 
   function startPack(packId: string) {
     setActiveView("play");
@@ -198,7 +218,11 @@ export function QuizExperience() {
         <section
           className="match-strip"
           aria-label={
-            activeView === "play" ? "Quiz progress" : "Prediction league status"
+            activeView === "play"
+              ? "Quiz progress"
+              : activeView === "leaderboard"
+                ? "Prediction league status"
+                : "Profile status"
           }
         >
           {activeView === "play" ? (
@@ -233,11 +257,17 @@ export function QuizExperience() {
                 <strong>00:14</strong>
                 <span>Score: {score}</span>
               </>
-            ) : (
+            ) : activeView === "leaderboard" ? (
               <>
                 <span>Prediction League</span>
                 <strong>Local</strong>
                 <span>Rewards locked</span>
+              </>
+            ) : (
+              <>
+                <span>Fan Profile</span>
+                <strong>{fanProfile.accuracy}%</strong>
+                <span>Device only</span>
               </>
             )}
           </div>
@@ -300,8 +330,21 @@ export function QuizExperience() {
                   savedPrediction: undefined,
                 });
               }}
+              leaderboard={predictionLeaderboard}
               saveState={predictionUi.saveState}
               savedPrediction={predictionUi.savedPrediction}
+            />
+          ) : activeView === "profile" ? (
+            <LocalProfileScreen
+              answeredCount={answeredCount}
+              fixture={scheduledPredictionFixture}
+              localPackIds={localPackIds}
+              localPredictionEntry={localPredictionEntry}
+              onStartPack={startPack}
+              outcome={outcome}
+              profile={fanProfile}
+              savedPrediction={predictionUi.savedPrediction}
+              totalQuestions={quizQuestions.length}
             />
           ) : !isComplete && currentQuestion ? (
             <QuestionCard
@@ -606,6 +649,7 @@ function ResultCard({
 interface PredictionLeagueScreenProps {
   draft: ScoreLine;
   fixture?: PredictionFixture;
+  leaderboard: PredictionLeagueEntry[];
   lockState?: PredictionLockState;
   saveState: PredictionSaveState;
   savedPrediction?: ScorePrediction;
@@ -617,6 +661,7 @@ interface PredictionLeagueScreenProps {
 function PredictionLeagueScreen({
   draft,
   fixture,
+  leaderboard,
   lockState,
   saveState,
   savedPrediction,
@@ -624,29 +669,6 @@ function PredictionLeagueScreen({
   onDraftChange,
   onSave,
 }: PredictionLeagueScreenProps) {
-  const predictions = useMemo(
-    () =>
-      savedPrediction
-        ? [...mockScorePredictions, savedPrediction]
-        : mockScorePredictions,
-    [savedPrediction],
-  );
-  const members = useMemo(
-    () =>
-      savedPrediction
-        ? [...mockPredictionMembers, localPredictionMember]
-        : mockPredictionMembers,
-    [savedPrediction],
-  );
-  const leaderboard = useMemo(
-    () =>
-      buildPredictionLeaderboard({
-        fixtures: mockPredictionFixtures,
-        members,
-        predictions,
-      }),
-    [members, predictions],
-  );
   const completedFixtures = mockPredictionFixtures.filter(
     (candidate) => candidate.status === "completed",
   );
@@ -846,6 +868,162 @@ function PredictionLeagueScreen({
   );
 }
 
+interface LocalProfileScreenProps {
+  answeredCount: number;
+  fixture?: PredictionFixture;
+  localPackIds: ReadonlySet<string>;
+  localPredictionEntry?: PredictionLeagueEntry;
+  outcome: QuizOutcome;
+  profile: FanProfile;
+  savedPrediction?: ScorePrediction;
+  totalQuestions: number;
+  onStartPack: (packId: string) => void;
+}
+
+function LocalProfileScreen({
+  answeredCount,
+  fixture,
+  localPackIds,
+  localPredictionEntry,
+  outcome,
+  profile,
+  savedPrediction,
+  totalQuestions,
+  onStartPack,
+}: LocalProfileScreenProps) {
+  const packs = recommendPacks(profile);
+  const savedPickLabel =
+    savedPrediction && fixture
+      ? `${fixture.homeTeam.shortName} ${savedPrediction.score.home}-${savedPrediction.score.away} ${fixture.awayTeam.shortName}`
+      : "No pick";
+
+  return (
+    <section className="profile-screen" aria-label="Local profile">
+      <div className="league-topline profile-topline">
+        <span className="score-pill profile-pill">
+          <User aria-hidden="true" size={15} />
+          Local profile
+        </span>
+        <span className="locked-pill">
+          <Shield aria-hidden="true" size={14} />
+          Device only
+        </span>
+      </div>
+
+      <div className="profile-hero">
+        <div>
+          <p>Knowledge level</p>
+          <h2>Fan Profile</h2>
+          <strong>{profile.level}</strong>
+        </div>
+        <div
+          className="profile-badge"
+          aria-label={`${profile.accuracy}% quiz accuracy`}
+        >
+          <Trophy aria-hidden="true" size={22} />
+          <span>{profile.accuracy}%</span>
+        </div>
+      </div>
+
+      <div className="profile-stat-grid" aria-label="Local profile stats">
+        <ProfileStat label="Quiz accuracy" value={`${profile.accuracy}%`} />
+        <ProfileStat
+          label="Questions"
+          value={`${answeredCount}/${totalQuestions}`}
+        />
+        <ProfileStat
+          label="Prediction pts"
+          value={`${localPredictionEntry?.points ?? 0}`}
+        />
+        <ProfileStat label="Correct" value={`${outcome.correctCount}`} />
+      </div>
+
+      <section className="profile-section" aria-label="Strongest signals">
+        <div className="prediction-section-title">
+          <span>Signals</span>
+          <small>{profile.selectedTopics.length} active topics</small>
+        </div>
+        <div className="signal-list">
+          {profile.strongestSignals.map((signal) => (
+            <span className="signal-chip" key={signal}>
+              {formatSignalLabel(signal)}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="profile-pick-card"
+        aria-label="Local prediction summary"
+      >
+        <div>
+          <span>Saved pick</span>
+          <strong>{savedPickLabel}</strong>
+          <p>
+            {savedPrediction && fixture
+              ? `${fixture.competition} / ${fixture.matchday}`
+              : "No local pick saved"}
+          </p>
+        </div>
+        <Medal aria-hidden="true" size={26} />
+      </section>
+
+      <section
+        className="profile-section"
+        aria-label="Profile pack recommendations"
+      >
+        <div className="prediction-section-title">
+          <span>Next focus</span>
+          <small>{profile.level}</small>
+        </div>
+        <div className="profile-pack-list">
+          {packs.map((pack) => {
+            const playable = localPackIds.has(pack.id);
+
+            return (
+              <article className="pack-row" key={pack.id}>
+                <div>
+                  <h3>{pack.title}</h3>
+                  <p>{pack.description}</p>
+                </div>
+                {playable ? (
+                  <button
+                    aria-label={`Start ${pack.title}`}
+                    className="pack-action"
+                    onClick={() => onStartPack(pack.id)}
+                    type="button"
+                  >
+                    <Play aria-hidden="true" size={14} />
+                    <span>Play</span>
+                  </button>
+                ) : (
+                  <span className="pack-badge">{pack.freshness}</span>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ProfileStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="profile-stat" aria-label={`${label} ${value}`}>
+      <span>{value}</span>
+      <small>{label}</small>
+    </div>
+  );
+}
+
+function formatSignalLabel(signal: string) {
+  return signal
+    .split("-")
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
+}
+
 function getPredictionSaveMessage(
   draft: ScoreLine,
   prediction: ScorePrediction,
@@ -909,7 +1087,7 @@ function BottomNav({
     { label: "Home", icon: Home, view: "play" as const },
     { label: "Play", icon: Play, view: "play" as const },
     { label: "Leaderboard", icon: BarChart3, view: "leaderboard" as const },
-    { label: "Profile", icon: User, view: "play" as const },
+    { label: "Profile", icon: User, view: "profile" as const },
   ];
 
   return (
@@ -918,7 +1096,8 @@ function BottomNav({
         const Icon = item.icon;
         const active =
           (item.label === "Play" && activeView === "play") ||
-          (item.label === "Leaderboard" && activeView === "leaderboard");
+          (item.label === "Leaderboard" && activeView === "leaderboard") ||
+          (item.label === "Profile" && activeView === "profile");
 
         return (
           <button

@@ -29,6 +29,7 @@ The first session should:
 - Cross-platform mobile app direction.
 - Frictionless first quiz without mandatory account creation.
 - Knowledge-level estimation.
+- A local profile surface that summarizes quiz level, strongest signals, saved prediction state, and next recommended packs before account infrastructure exists.
 - Personalization by country, league, club, player, and topic interest.
 - Quiz content that mixes timeless knowledge with recent football events.
 - Score-prediction league direction as a future product mode.

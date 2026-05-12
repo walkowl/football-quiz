@@ -132,6 +132,24 @@ describe("QuizExperience", () => {
     expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
   });
 
+  it("opens the local profile tab with quiz and prediction state", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Fan Profile" }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Questions 0/3")).toBeInTheDocument();
+    expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
+      "No local pick saved",
+    );
+    expect(screen.getByRole("button", { name: "Profile" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+  });
+
   it("updates and clears a local score prediction", () => {
     render(<QuizExperience />);
 
@@ -191,6 +209,28 @@ describe("QuizExperience", () => {
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Napoli score")).toHaveValue(3);
     expect(screen.getByLabelText("Inter score")).toHaveValue(0);
+  });
+
+  it("shows a restored local score prediction on the profile tab", () => {
+    saveLocalScorePrediction(storage, {
+      id: "local-mock-serie-a-nap-int-2026-05-16",
+      fixtureId: "mock-serie-a-nap-int-2026-05-16",
+      userId: "local-user",
+      submittedAt: "2026-05-12T00:00:00.000Z",
+      score: {
+        home: 3,
+        away: 0,
+      },
+    });
+
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
+      "NAP 3-0 INT",
+    );
+    expect(screen.getByLabelText("Prediction pts 0")).toBeInTheDocument();
   });
 
   it("renders a deliberate fallback when question media is missing", () => {

@@ -56,6 +56,7 @@ The local mock layer now includes:
 - Image-led questions for the preferred visual loop.
 - Text-only questions for provider, licensing, or missing-photo cases.
 - A local next-pack handoff from the first-run result screen into Weekly Pulse.
+- A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 
 This is enough to keep building locally while the quiz contract stabilizes. It is not yet enough to pay for a football data provider.
 
