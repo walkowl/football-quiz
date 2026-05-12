@@ -51,6 +51,19 @@ test("first-run quiz can be completed on a mobile viewport", async ({
     }),
   ).toBeVisible();
   await expect(page.getByText("Question 1/3")).toBeVisible();
+
+  await page.getByRole("button", { name: "Profile" }).tap();
+  await expect(page.getByLabel("Local quiz history")).toContainText(
+    "Legend Challenge / 3/3",
+  );
+  await expect(page.getByLabel("Questions 3/3")).toBeVisible();
+
+  await page.getByRole("button", { name: "Play" }).tap();
+  await expect(
+    page.getByRole("heading", {
+      name: "Who won the featured derby in this week's local pulse?",
+    }),
+  ).toBeVisible();
 });
 
 test("home screen has no serious accessibility violations", async ({

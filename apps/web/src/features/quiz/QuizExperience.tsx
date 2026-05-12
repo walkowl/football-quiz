@@ -66,6 +66,7 @@ import {
   getBrowserQuizProgressStorage,
   readLocalQuizProgress,
   saveLocalQuizProgress,
+  type LocalQuizAttempt,
   type LocalQuizProgress,
 } from "./localQuizProgressStorage";
 
@@ -84,6 +85,7 @@ const defaultPredictionDraft: ScoreLine = {
   away: 1,
 };
 const defaultSelectedTopics = ["premier-league", "transfers"];
+const maxLocalCompletedAttempts = 12;
 const topicIds = new Set(topicOptions.map((topic) => topic.id));
 const scheduledPredictionFixture = mockPredictionFixtures.find(
   (fixture) => fixture.status === "scheduled",
@@ -95,6 +97,7 @@ type PredictionSaveState = "draft" | "saved" | "restored" | "unavailable";
 interface QuizUiState {
   activePackId: string;
   answers: AnswerMap;
+  completedAttempts: LocalQuizAttempt[];
   questionIndex: number;
   selectedTopics: string[];
 }
@@ -149,14 +152,8 @@ export function QuizExperience() {
     quizQuestions.length,
   );
 
-  const outcome = useMemo(
-    () => evaluateQuiz(quizQuestions, answers),
-    [answers, quizQuestions],
-  );
-  const fanProfile = useMemo(
-    () => buildFanProfile(quizQuestions, answers, selectedTopics),
-    [answers, quizQuestions, selectedTopics],
-  );
+  const outcome = evaluateQuiz(quizQuestions, answers);
+  const fanProfile = buildFanProfile(quizQuestions, answers, selectedTopics);
   const score = outcome.weightedScore * 420;
   const scheduledPredictionLockState = scheduledPredictionFixture
     ? getPredictionLockState(scheduledPredictionFixture, localPredictionClockAt)
@@ -178,11 +175,27 @@ export function QuizExperience() {
   const localPredictionEntry = predictionLeaderboard.find(
     (entry) => entry.userId === localPredictionMember.userId,
   );
+  const localProfileSummary = buildLocalProfileSummary({
+    activePackTitle: activePack.title,
+    answeredCount,
+    completedAttempts: quizUi.completedAttempts,
+    isComplete,
+    outcome,
+    profile: fanProfile,
+    totalQuestions: quizQuestions.length,
+  });
 
   function startPack(packId: string) {
+    const completedAttempts = isComplete
+      ? recordCompletedAttempt(
+          quizUi.completedAttempts,
+          createCompletedAttempt(activePack, outcome, fanProfile),
+        )
+      : quizUi.completedAttempts;
     const nextState = {
       activePackId: packId,
       answers: {},
+      completedAttempts,
       questionIndex: 0,
       selectedTopics,
     };
@@ -206,9 +219,19 @@ export function QuizExperience() {
   }
 
   function goNext() {
+    const nextQuestionIndex = questionIndex + 1;
+    const completedAttempts =
+      nextQuestionIndex >= quizQuestions.length
+        ? recordCompletedAttempt(
+            quizUi.completedAttempts,
+            createCompletedAttempt(activePack, outcome, fanProfile),
+          )
+        : quizUi.completedAttempts;
+
     commitQuizUiState({
       ...quizUi,
-      questionIndex: questionIndex + 1,
+      completedAttempts,
+      questionIndex: nextQuestionIndex,
     });
   }
 
@@ -317,7 +340,7 @@ export function QuizExperience() {
             ) : (
               <>
                 <span>Fan Profile</span>
-                <strong>{fanProfile.accuracy}%</strong>
+                <strong>{localProfileSummary.accuracy}%</strong>
                 <span>Device only</span>
               </>
             )}
@@ -387,15 +410,13 @@ export function QuizExperience() {
             />
           ) : activeView === "profile" ? (
             <LocalProfileScreen
-              answeredCount={answeredCount}
               fixture={scheduledPredictionFixture}
               localPackIds={localPackIds}
               localPredictionEntry={localPredictionEntry}
               onStartPack={startPack}
-              outcome={outcome}
               profile={fanProfile}
+              profileSummary={localProfileSummary}
               savedPrediction={predictionUi.savedPrediction}
-              totalQuestions={quizQuestions.length}
             />
           ) : !isComplete && currentQuestion ? (
             <QuestionCard
@@ -919,27 +940,35 @@ function PredictionLeagueScreen({
   );
 }
 
-interface LocalProfileScreenProps {
+interface LocalProfileSummary {
+  accuracy: number;
   answeredCount: number;
+  correctCount: number;
+  historyLabel: string;
+  latestAttemptLabel: string;
+  level: FanProfile["level"];
+  strongestSignals: string[];
+  topicCount: number;
+  totalQuestions: number;
+}
+
+interface LocalProfileScreenProps {
   fixture?: PredictionFixture;
   localPackIds: ReadonlySet<string>;
   localPredictionEntry?: PredictionLeagueEntry;
-  outcome: QuizOutcome;
   profile: FanProfile;
+  profileSummary: LocalProfileSummary;
   savedPrediction?: ScorePrediction;
-  totalQuestions: number;
   onStartPack: (packId: string) => void;
 }
 
 function LocalProfileScreen({
-  answeredCount,
   fixture,
   localPackIds,
   localPredictionEntry,
-  outcome,
   profile,
+  profileSummary,
   savedPrediction,
-  totalQuestions,
   onStartPack,
 }: LocalProfileScreenProps) {
   const packs = recommendPacks(profile);
@@ -965,42 +994,54 @@ function LocalProfileScreen({
         <div>
           <p>Knowledge level</p>
           <h2>Fan Profile</h2>
-          <strong>{profile.level}</strong>
+          <strong>{profileSummary.level}</strong>
         </div>
         <div
           className="profile-badge"
-          aria-label={`${profile.accuracy}% quiz accuracy`}
+          aria-label={`${profileSummary.accuracy}% quiz accuracy`}
         >
           <Trophy aria-hidden="true" size={22} />
-          <span>{profile.accuracy}%</span>
+          <span>{profileSummary.accuracy}%</span>
         </div>
       </div>
 
       <div className="profile-stat-grid" aria-label="Local profile stats">
-        <ProfileStat label="Quiz accuracy" value={`${profile.accuracy}%`} />
+        <ProfileStat
+          label="Quiz accuracy"
+          value={`${profileSummary.accuracy}%`}
+        />
         <ProfileStat
           label="Questions"
-          value={`${answeredCount}/${totalQuestions}`}
+          value={`${profileSummary.answeredCount}/${profileSummary.totalQuestions}`}
         />
         <ProfileStat
           label="Prediction pts"
           value={`${localPredictionEntry?.points ?? 0}`}
         />
-        <ProfileStat label="Correct" value={`${outcome.correctCount}`} />
+        <ProfileStat label="Correct" value={`${profileSummary.correctCount}`} />
       </div>
 
       <section className="profile-section" aria-label="Strongest signals">
         <div className="prediction-section-title">
           <span>Signals</span>
-          <small>{profile.selectedTopics.length} active topics</small>
+          <small>{profileSummary.topicCount} active topics</small>
         </div>
         <div className="signal-list">
-          {profile.strongestSignals.map((signal) => (
+          {profileSummary.strongestSignals.map((signal) => (
             <span className="signal-chip" key={signal}>
               {formatSignalLabel(signal)}
             </span>
           ))}
         </div>
+      </section>
+
+      <section className="profile-history-card" aria-label="Local quiz history">
+        <div>
+          <span>Quiz history</span>
+          <strong>{profileSummary.historyLabel}</strong>
+          <p>{profileSummary.latestAttemptLabel}</p>
+        </div>
+        <Trophy aria-hidden="true" size={26} />
       </section>
 
       <section
@@ -1025,7 +1066,7 @@ function LocalProfileScreen({
       >
         <div className="prediction-section-title">
           <span>Next focus</span>
-          <small>{profile.level}</small>
+          <small>{profileSummary.level}</small>
         </div>
         <div className="profile-pack-list">
           {packs.map((pack) => {
@@ -1068,11 +1109,98 @@ function ProfileStat({ label, value }: { label: string; value: string }) {
   );
 }
 
+function buildLocalProfileSummary({
+  activePackTitle,
+  answeredCount,
+  completedAttempts,
+  isComplete,
+  outcome,
+  profile,
+  totalQuestions,
+}: {
+  activePackTitle: string;
+  answeredCount: number;
+  completedAttempts: LocalQuizAttempt[];
+  isComplete: boolean;
+  outcome: QuizOutcome;
+  profile: FanProfile;
+  totalQuestions: number;
+}): LocalProfileSummary {
+  if (completedAttempts.length === 0) {
+    if (isComplete && totalQuestions > 0) {
+      return {
+        accuracy: profile.accuracy,
+        answeredCount,
+        correctCount: outcome.correctCount,
+        historyLabel: "1 completed pack",
+        latestAttemptLabel: `${activePackTitle} / ${outcome.correctCount}/${outcome.totalQuestions}`,
+        level: profile.level,
+        strongestSignals: profile.strongestSignals,
+        topicCount: profile.selectedTopics.length,
+        totalQuestions,
+      };
+    }
+
+    return {
+      accuracy: profile.accuracy,
+      answeredCount,
+      correctCount: outcome.correctCount,
+      historyLabel: "No completed packs",
+      latestAttemptLabel: "Finish a quiz to start history",
+      level: profile.level,
+      strongestSignals: profile.strongestSignals,
+      topicCount: profile.selectedTopics.length,
+      totalQuestions,
+    };
+  }
+
+  const correctCount = completedAttempts.reduce(
+    (total, attempt) => total + attempt.correctCount,
+    0,
+  );
+  const historyQuestions = completedAttempts.reduce(
+    (total, attempt) => total + attempt.totalQuestions,
+    0,
+  );
+  const latestAttempt = completedAttempts[0]!;
+  const completedPackCount = new Set(
+    completedAttempts.map((attempt) => attempt.packId),
+  ).size;
+
+  return {
+    accuracy:
+      historyQuestions === 0
+        ? 0
+        : Math.round((correctCount / historyQuestions) * 100),
+    answeredCount: historyQuestions,
+    correctCount,
+    historyLabel: `${completedPackCount} completed ${
+      completedPackCount === 1 ? "pack" : "packs"
+    }`,
+    latestAttemptLabel: `${latestAttempt.packTitle} / ${latestAttempt.correctCount}/${latestAttempt.totalQuestions}`,
+    level: latestAttempt.level,
+    strongestSignals: getUniqueSignals(completedAttempts),
+    topicCount: profile.selectedTopics.length,
+    totalQuestions: historyQuestions,
+  };
+}
+
 function formatSignalLabel(signal: string) {
   return signal
     .split("-")
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join(" ");
+}
+
+function getUniqueSignals(attempts: LocalQuizAttempt[]) {
+  const signals = attempts.flatMap((attempt) => attempt.strongestSignals);
+  const uniqueSignals = signals.filter(
+    (signal, index) => signals.indexOf(signal) === index,
+  );
+
+  return uniqueSignals.length > 0
+    ? uniqueSignals.slice(0, 3)
+    : ["starter-pack"];
 }
 
 function getPredictionSaveMessage(
@@ -1114,6 +1242,9 @@ function getStoredQuizUiState(snapshot: string): QuizUiState {
   return {
     activePackId: activePack.id,
     answers: normalizeStoredAnswers(activePack, storedProgress.answers),
+    completedAttempts: normalizeStoredAttempts(
+      storedProgress.completedAttempts,
+    ),
     questionIndex: Math.min(
       storedProgress.questionIndex,
       activePack.questions.length,
@@ -1126,6 +1257,7 @@ function createDefaultQuizUiState(): QuizUiState {
   return {
     activePackId: firstRunQuizPack.id,
     answers: {},
+    completedAttempts: [],
     questionIndex: 0,
     selectedTopics: defaultSelectedTopics,
   };
@@ -1211,6 +1343,33 @@ function saveQuizUiState(state: QuizUiState) {
   saveLocalQuizProgress(getBrowserQuizProgressStorage(), progress);
 }
 
+function createCompletedAttempt(
+  pack: QuizPack,
+  outcome: QuizOutcome,
+  profile: FanProfile,
+): LocalQuizAttempt {
+  return {
+    accuracy: profile.accuracy,
+    completedAt: new Date().toISOString(),
+    correctCount: outcome.correctCount,
+    level: outcome.level,
+    packId: pack.id,
+    packTitle: pack.title,
+    strongestSignals: profile.strongestSignals,
+    totalQuestions: outcome.totalQuestions,
+  };
+}
+
+function recordCompletedAttempt(
+  attempts: LocalQuizAttempt[],
+  nextAttempt: LocalQuizAttempt,
+) {
+  return [
+    nextAttempt,
+    ...attempts.filter((attempt) => attempt.packId !== nextAttempt.packId),
+  ].slice(0, maxLocalCompletedAttempts);
+}
+
 function normalizeStoredAnswers(pack: QuizPack, answers: AnswerMap) {
   return pack.questions.reduce<AnswerMap>((validAnswers, question) => {
     const selectedOptionId = answers[question.id];
@@ -1233,6 +1392,10 @@ function normalizeStoredTopics(selectedTopics: string[]) {
   );
 
   return topics.length > 0 ? topics : defaultSelectedTopics;
+}
+
+function normalizeStoredAttempts(attempts: LocalQuizAttempt[] | undefined) {
+  return attempts?.slice(0, maxLocalCompletedAttempts) ?? [];
 }
 
 function formatFixtureDate(value: string) {

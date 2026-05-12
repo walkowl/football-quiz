@@ -864,7 +864,8 @@ button {
   padding: 7px 9px;
 }
 
-.profile-pick-card {
+.profile-pick-card,
+.profile-history-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -877,12 +878,16 @@ button {
 
 .profile-pick-card span,
 .profile-pick-card strong,
-.profile-pick-card p {
+.profile-pick-card p,
+.profile-history-card span,
+.profile-history-card strong,
+.profile-history-card p {
   display: block;
   margin: 0;
 }
 
-.profile-pick-card span {
+.profile-pick-card span,
+.profile-history-card span {
   color: var(--amber);
   font-size: 0.68rem;
   font-weight: 900;
@@ -890,7 +895,8 @@ button {
   text-transform: uppercase;
 }
 
-.profile-pick-card strong {
+.profile-pick-card strong,
+.profile-history-card strong {
   overflow: hidden;
   margin-top: 4px;
   color: var(--ink);
@@ -900,14 +906,16 @@ button {
   white-space: nowrap;
 }
 
-.profile-pick-card p {
+.profile-pick-card p,
+.profile-history-card p {
   margin-top: 3px;
   color: rgba(246, 244, 238, 0.58);
   font-size: 0.7rem;
   font-weight: 720;
 }
 
-.profile-pick-card svg {
+.profile-pick-card svg,
+.profile-history-card svg {
   color: #f5b36f;
 }
 

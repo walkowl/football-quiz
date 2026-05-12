@@ -4,7 +4,10 @@ import {
   readLocalScorePrediction,
   saveLocalScorePrediction,
 } from "./localPredictionStorage";
-import { readLocalQuizProgress } from "./localQuizProgressStorage";
+import {
+  readLocalQuizProgress,
+  saveLocalQuizProgress,
+} from "./localQuizProgressStorage";
 import { QuestionMedia, QuizExperience } from "./QuizExperience";
 
 describe("QuizExperience", () => {
@@ -73,6 +76,42 @@ describe("QuizExperience", () => {
     expect(screen.getAllByText("Advanced Fan").length).toBeGreaterThan(0);
     expect(screen.getByLabelText("Questions 3/3")).toBeInTheDocument();
     expect(screen.getByLabelText("Quiz accuracy 100%")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Start Weekly Pulse" }));
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.getByLabelText("Local quiz history")).toHaveTextContent(
+      "Legend Challenge / 3/3",
+    );
+    expect(screen.getByLabelText("Questions 3/3")).toBeInTheDocument();
+  });
+
+  it("backfills local history from a completed quiz saved before history existed", () => {
+    saveLocalQuizProgress(storage, {
+      activePackId: "mock-legend-challenge",
+      answers: {
+        "mock-week-1-legend": "ronaldo",
+        "mock-week-1-leverkusen": "leverkusen",
+        "mock-week-1-market-value": "young-winger",
+      },
+      questionIndex: 3,
+      selectedTopics: ["premier-league", "transfers"],
+      updatedAt: "2026-05-12T00:00:00.000Z",
+    });
+
+    render(<QuizExperience />);
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.getByLabelText("Local quiz history")).toHaveTextContent(
+      "Legend Challenge / 3/3",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Start Weekly Pulse" }));
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.getByLabelText("Local quiz history")).toHaveTextContent(
+      "Legend Challenge / 3/3",
+    );
   });
 
   it("starts the local weekly pulse pack from the result screen", () => {

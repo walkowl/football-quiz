@@ -31,6 +31,7 @@ The first session should:
 - Knowledge-level estimation.
 - A local profile surface that summarizes quiz level, strongest signals, saved prediction state, and next recommended packs before account infrastructure exists.
 - Device-only persistence for the first quiz loop so progress survives refreshes without introducing login or backend storage.
+- Local completed-quiz history for early profile quality, while keeping cross-device identity and long-term accounts out of the first pass.
 - Personalization by country, league, club, player, and topic interest.
 - Quiz content that mixes timeless knowledge with recent football events.
 - Score-prediction league direction as a future product mode.
