@@ -44,6 +44,7 @@ Expected checks:
 - Separate quiz content, scoring, user profiling, and presentation concerns.
 - Prefer deterministic domain logic that is easy to test.
 - Avoid framework-specific leakage into core domain rules.
+- Share domain intelligence and contracts across platforms; do not force all platforms to share one UI layer.
 - Make data freshness visible in the model where it affects quiz correctness.
 - Design content ingestion with source attribution and expiry in mind.
 

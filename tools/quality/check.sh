@@ -47,6 +47,7 @@ ensure_not_staged() {
 step "checking repository boundaries"
 require_file "README.md"
 require_file "docs/PROJECT_BOUNDARIES.md"
+require_file "docs/PLATFORM_STRATEGY.md"
 require_file "docs/ENGINEERING_GUARDRAILS.md"
 require_file "docs/LOCAL_QUALITY_PATH.md"
 require_file "docs/decisions/0001-project-boundaries.md"
