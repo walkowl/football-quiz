@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPlayerBenchmark,
   buildFanProfile,
   classifyKnowledge,
+  compareQuizPerformanceWithPlayers,
   evaluateQuiz,
   getFeedback,
   recommendPacks,
@@ -31,6 +33,30 @@ describe("quiz domain", () => {
   it("uses weighted thresholds for knowledge levels", () => {
     expect(classifyKnowledge(3, 6)).toBe("Intermediate Fan");
     expect(classifyKnowledge(5, 6)).toBe("Daily Follower");
+  });
+
+  it("compares quiz performance against a player benchmark", () => {
+    const answers = Object.fromEntries(
+      mockQuestions.map((question) => [question.id, question.correctOptionId]),
+    );
+
+    expect(compareQuizPerformanceWithPlayers(mockQuestions, answers)).toEqual({
+      betterThanPercent: 94,
+      detail: "Local mock cohort.",
+      label: "Better than 94% of players",
+      shortLabel: "Better than 94%",
+    });
+  });
+
+  it("keeps the player benchmark pending before an answer exists", () => {
+    expect(buildPlayerBenchmark(undefined)).toMatchObject({
+      betterThanPercent: null,
+      label: "Benchmark pending",
+    });
+    expect(compareQuizPerformanceWithPlayers(mockQuestions, {})).toMatchObject({
+      betterThanPercent: null,
+      shortLabel: "Benchmark pending",
+    });
   });
 
   it("returns useful feedback for a wrong answer", () => {

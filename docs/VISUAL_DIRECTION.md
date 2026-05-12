@@ -23,6 +23,14 @@ The first playable prototype should feel close to the preferred dark stadium moc
 
 The working name shown in the prototype can be `Footy Guess` while the repository remains `Football Quiz`.
 
+## Result Screen Rule
+
+The result screen should be compact and information-first.
+
+The first mobile viewport must show the relevant result information without making the user scroll: how they compare with other players, their knowledge level, accuracy or correct count, strongest signal, and the next action.
+
+Do not show meaningless score totals. Use a player-relative benchmark such as `Better than 74% of players`. During the local-only phase this can come from a mocked benchmark cohort, but the UI language and data model should be ready to replace it with a real user cohort later.
+
 ## Media Rule
 
 Normal quiz content should expect a photo or image.

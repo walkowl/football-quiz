@@ -63,6 +63,13 @@ export interface QuizOutcome {
   level: KnowledgeLevel;
 }
 
+export interface PlayerBenchmark {
+  betterThanPercent: number | null;
+  detail: string;
+  label: string;
+  shortLabel: string;
+}
+
 export interface FanProfile {
   level: KnowledgeLevel;
   accuracy: number;
@@ -82,6 +89,10 @@ const difficultyWeight: Record<Difficulty, number> = {
   medium: 2,
   advanced: 3,
 };
+const localPlayerBenchmarkRatios = [
+  0, 0.12, 0.18, 0.25, 0.33, 0.42, 0.5, 0.58, 0.64, 0.7, 0.76, 0.82, 0.88, 0.92,
+  0.96, 1,
+];
 
 export function isCorrect(question: QuizQuestion, selectedOptionId: string) {
   return question.correctOptionId === selectedOptionId;
@@ -146,6 +157,62 @@ export function classifyKnowledge(
   }
 
   return "Newbie";
+}
+
+export function compareQuizPerformanceWithPlayers(
+  questions: QuizQuestion[],
+  answers: AnswerMap,
+): PlayerBenchmark {
+  const attemptedQuestions = questions.filter(
+    (question) => answers[question.id],
+  );
+
+  if (attemptedQuestions.length === 0) {
+    return buildPlayerBenchmark(undefined);
+  }
+
+  const attemptedMaxScore = attemptedQuestions.reduce(
+    (total, question) => total + difficultyWeight[question.difficulty],
+    0,
+  );
+  const attemptedScore = attemptedQuestions.reduce((total, question) => {
+    const selectedOptionId = answers[question.id];
+
+    return selectedOptionId && isCorrect(question, selectedOptionId)
+      ? total + difficultyWeight[question.difficulty]
+      : total;
+  }, 0);
+
+  return buildPlayerBenchmark(attemptedScore / attemptedMaxScore);
+}
+
+export function buildPlayerBenchmark(
+  performanceRatio: number | undefined,
+): PlayerBenchmark {
+  if (performanceRatio === undefined || !Number.isFinite(performanceRatio)) {
+    return {
+      betterThanPercent: null,
+      detail: "Answer to compare.",
+      label: "Benchmark pending",
+      shortLabel: "Benchmark pending",
+    };
+  }
+
+  const normalizedRatio = Math.min(Math.max(performanceRatio, 0), 1);
+  const betterThanPercent = Math.round(
+    (localPlayerBenchmarkRatios.filter(
+      (benchmarkRatio) => normalizedRatio > benchmarkRatio,
+    ).length /
+      localPlayerBenchmarkRatios.length) *
+      100,
+  );
+
+  return {
+    betterThanPercent,
+    detail: "Local mock cohort.",
+    label: `Better than ${betterThanPercent}% of players`,
+    shortLabel: `Better than ${betterThanPercent}%`,
+  };
 }
 
 export function getFeedback(question: QuizQuestion, selectedOptionId: string) {

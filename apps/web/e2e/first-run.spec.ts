@@ -20,6 +20,8 @@ test("first-run quiz can be completed on a mobile viewport", async ({
 
   await page.getByRole("button", { name: "Cristiano Ronaldo" }).tap();
   await expect(page.getByTestId("feedback")).toContainText("Correct");
+  await expect(page.getByText("Better than 94%")).toBeVisible();
+  await expect(page.getByText(/Score:/)).toHaveCount(0);
 
   await page.getByRole("button", { name: /Next question/ }).tap();
   await page.getByRole("button", { name: "Bayer Leverkusen" }).tap();
@@ -33,6 +35,7 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   await expect(
     page.getByRole("heading", { name: "Advanced Fan" }),
   ).toBeVisible();
+  await expect(page.getByText("Better than 94% of players")).toBeVisible();
   await expect(page.getByLabel("Fan profile summary")).toContainText("100%");
   await expect(page.getByText("Next packs")).toBeVisible();
 
@@ -161,6 +164,41 @@ test("profile tab summarizes local quiz and prediction state", async ({
     "NAP 2-1 INT",
   );
   await expect(page.getByLabel("Prediction pts 0")).toBeVisible();
+});
+
+test("home hub routes between local mobile surfaces", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  await page.getByRole("button", { name: "Home" }).tap();
+
+  await expect(
+    page.getByRole("heading", { name: "Matchday Hub" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Home status")).toContainText("Mock data");
+  await expect(page.getByText("Benchmark pending").first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Open Continue quiz" }).tap();
+  await expect(
+    page.getByRole("heading", { name: "Who is this football legend?" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Cristiano Ronaldo" }).tap();
+  await page.getByRole("button", { name: "Home" }).tap();
+  await expect(page.getByText("Better than 94%").first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Open Fan profile" }).tap();
+  await expect(
+    page.getByRole("heading", { name: "Fan Profile" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Vs players Better than 94%")).toBeVisible();
+
+  await page.getByRole("button", { name: "Home" }).tap();
+  await page.getByRole("button", { name: "Open Score League" }).tap();
+  await expect(
+    page.getByRole("heading", { name: "Score League" }),
+  ).toBeVisible();
 });
 
 test("home screen keeps the approved mobile visual direction", async ({

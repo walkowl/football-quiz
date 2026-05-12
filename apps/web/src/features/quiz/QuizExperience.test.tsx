@@ -30,6 +30,8 @@ describe("QuizExperience", () => {
       screen.getByRole("group", { name: "Question data status" }),
     ).toHaveTextContent("Mock week");
     expect(screen.getByTestId("feedback")).toHaveTextContent("Correct");
+    expect(screen.getByText("Better than 94%")).toBeInTheDocument();
+    expect(screen.queryByText(/Score:/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Next question/ })).toBeEnabled();
   });
 
@@ -53,6 +55,7 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Advanced Fan" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Better than 94% of players")).toBeInTheDocument();
   });
 
   it("persists completed quiz progress and restores it on reload", () => {
@@ -203,6 +206,9 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Fan Profile" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Vs players Benchmark pending"),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Questions 0/3")).toBeInTheDocument();
     expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
       "No local pick saved",
@@ -211,6 +217,43 @@ describe("QuizExperience", () => {
       "aria-current",
       "page",
     );
+  });
+
+  it("opens the local home hub and routes to the main surfaces", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Matchday Hub" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Home" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByLabelText("Local data status")).toHaveTextContent(
+      "Mock data",
+    );
+    expect(screen.getAllByText("Benchmark pending").length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Fan profile" }));
+    expect(
+      screen.getByRole("heading", { name: "Fan Profile" }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Score League" }));
+    expect(
+      screen.getByRole("heading", { name: "Score League" }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+    fireEvent.click(screen.getByRole("button", { name: "Open Continue quiz" }));
+    expect(
+      screen.getByRole("heading", {
+        name: "Who is this football legend?",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("updates and clears a local score prediction", () => {

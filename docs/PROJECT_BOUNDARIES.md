@@ -21,14 +21,25 @@ The first session should:
 1. Start with a short football quiz.
 2. Ask roughly three questions across easy, medium, and advanced difficulty.
 3. Estimate the user's football knowledge level.
-4. Suggest relevant leagues, teams, players, countries, or topics.
-5. Ask lightweight personalization questions only after the quiz has created engagement.
+4. Show how the user compares with other players using a meaningful "better than X% of players" style benchmark.
+5. Suggest relevant leagues, teams, players, countries, or topics.
+6. Ask lightweight personalization questions only after the quiz has created engagement.
+
+## UX Requirements
+
+- Do not show arbitrary score counters such as fake points, coin totals, or unexplained numeric scores.
+- Quiz results must use meaningful comparative language, especially how much better the user performed than other players.
+- While the project is local-only, player comparison may use a clearly local mocked benchmark cohort.
+- Once real user data exists, the benchmark should be backed by real cohort data and should say which cohort it compares against.
+- The result screen must keep the most relevant information above the fold on mobile: player comparison, knowledge level, accuracy or correct count, strongest signal, and the next useful action.
+- Users should not need to scroll before understanding how they did or what to do next.
 
 ## In Scope
 
 - Cross-platform mobile app direction.
 - Frictionless first quiz without mandatory account creation.
 - Knowledge-level estimation.
+- Meaningful player-relative performance comparison instead of arbitrary game score totals.
 - A local profile surface that summarizes quiz level, strongest signals, saved prediction state, and next recommended packs before account infrastructure exists.
 - Device-only persistence for the first quiz loop so progress survives refreshes without introducing login or backend storage.
 - Local completed-quiz history for early profile quality, while keeping cross-device identity and long-term accounts out of the first pass.

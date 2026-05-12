@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   Trash2,
   Trophy,
+  type LucideIcon,
   User,
   X,
 } from "lucide-react";
@@ -44,6 +45,8 @@ import {
 } from "../../domain/prediction";
 import {
   buildFanProfile,
+  buildPlayerBenchmark,
+  compareQuizPerformanceWithPlayers,
   evaluateQuiz,
   getFeedback,
   isCorrect,
@@ -51,6 +54,7 @@ import {
   recommendationCopy,
   type AnswerMap,
   type FanProfile,
+  type PlayerBenchmark,
   type QuizMedia,
   type QuizOutcome,
   type QuizPack,
@@ -91,7 +95,7 @@ const scheduledPredictionFixture = mockPredictionFixtures.find(
   (fixture) => fixture.status === "scheduled",
 );
 
-type AppView = "play" | "leaderboard" | "profile";
+type AppView = "home" | "play" | "leaderboard" | "profile";
 type PredictionSaveState = "draft" | "saved" | "restored" | "unavailable";
 
 interface QuizUiState {
@@ -154,7 +158,10 @@ export function QuizExperience() {
 
   const outcome = evaluateQuiz(quizQuestions, answers);
   const fanProfile = buildFanProfile(quizQuestions, answers, selectedTopics);
-  const score = outcome.weightedScore * 420;
+  const playerBenchmark = compareQuizPerformanceWithPlayers(
+    quizQuestions,
+    answers,
+  );
   const scheduledPredictionLockState = scheduledPredictionFixture
     ? getPredictionLockState(scheduledPredictionFixture, localPredictionClockAt)
     : undefined;
@@ -181,6 +188,7 @@ export function QuizExperience() {
     completedAttempts: quizUi.completedAttempts,
     isComplete,
     outcome,
+    playerBenchmark,
     profile: fanProfile,
     totalQuestions: quizQuestions.length,
   });
@@ -296,7 +304,9 @@ export function QuizExperience() {
               ? "Quiz progress"
               : activeView === "leaderboard"
                 ? "Prediction league status"
-                : "Profile status"
+                : activeView === "profile"
+                  ? "Profile status"
+                  : "Home status"
           }
         >
           {activeView === "play" ? (
@@ -329,7 +339,7 @@ export function QuizExperience() {
                     : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
                 </span>
                 <strong>00:14</strong>
-                <span>Score: {score}</span>
+                <span>{playerBenchmark.shortLabel}</span>
               </>
             ) : activeView === "leaderboard" ? (
               <>
@@ -337,18 +347,37 @@ export function QuizExperience() {
                 <strong>Local</strong>
                 <span>Rewards locked</span>
               </>
-            ) : (
+            ) : activeView === "profile" ? (
               <>
                 <span>Fan Profile</span>
-                <strong>{localProfileSummary.accuracy}%</strong>
+                <strong>
+                  {localProfileSummary.playerBenchmark.shortLabel}
+                </strong>
                 <span>Device only</span>
+              </>
+            ) : (
+              <>
+                <span>Home</span>
+                <strong>Local</strong>
+                <span>Mock data</span>
               </>
             )}
           </div>
         </section>
 
         <div className="screen-content">
-          {activeView === "leaderboard" ? (
+          {activeView === "home" ? (
+            <LocalHomeScreen
+              activePack={activePack}
+              answeredCount={answeredCount}
+              fixture={scheduledPredictionFixture}
+              isComplete={isComplete}
+              onNavigate={setActiveView}
+              profileSummary={localProfileSummary}
+              savedPrediction={predictionUi.savedPrediction}
+              totalQuestions={quizQuestions.length}
+            />
+          ) : activeView === "leaderboard" ? (
             <PredictionLeagueScreen
               draft={predictionUi.draft}
               fixture={scheduledPredictionFixture}
@@ -433,6 +462,7 @@ export function QuizExperience() {
               onRestart={restart}
               onStartPack={startPack}
               onToggleTopic={toggleTopic}
+              playerBenchmark={playerBenchmark}
               profile={fanProfile}
               outcome={outcome}
               selectedTopics={selectedTopics}
@@ -609,6 +639,7 @@ interface ResultCardProps {
   activePack: QuizPack;
   localPackIds: ReadonlySet<string>;
   outcome: ReturnType<typeof evaluateQuiz>;
+  playerBenchmark: PlayerBenchmark;
   profile: ReturnType<typeof buildFanProfile>;
   selectedTopics: string[];
   onRestart: () => void;
@@ -620,6 +651,7 @@ function ResultCard({
   activePack,
   localPackIds,
   outcome,
+  playerBenchmark,
   profile,
   selectedTopics,
   onRestart,
@@ -631,9 +663,7 @@ function ResultCard({
   return (
     <section className="result-card" aria-label="Quiz result">
       <div className="result-topline">
-        <span className="score-pill">
-          {outcome.correctCount}/{outcome.totalQuestions} correct
-        </span>
+        <span className="score-pill">{playerBenchmark.label}</span>
         <button
           aria-label="Try again"
           className="chrome-button"
@@ -649,6 +679,12 @@ function ResultCard({
 
       <div className="profile-panel" aria-label="Fan profile summary">
         <div>
+          <span className="profile-value">
+            {outcome.correctCount}/{outcome.totalQuestions}
+          </span>
+          <span className="profile-label">correct</span>
+        </div>
+        <div>
           <span className="profile-value">{profile.accuracy}%</span>
           <span className="profile-label">accuracy</span>
         </div>
@@ -656,29 +692,6 @@ function ResultCard({
           <span className="profile-value">{profile.strongestSignals[0]}</span>
           <span className="profile-label">strongest signal</span>
         </div>
-      </div>
-
-      <div className="personalize-header">
-        <SlidersHorizontal aria-hidden="true" size={18} />
-        <span>Tune the next quiz</span>
-      </div>
-      <div className="topic-grid">
-        {topicOptions.map((topic) => {
-          const active = selectedTopics.includes(topic.id);
-
-          return (
-            <button
-              aria-pressed={active}
-              className={`topic-toggle ${active ? "active" : ""}`}
-              key={topic.id}
-              onClick={() => onToggleTopic(topic.id)}
-              type="button"
-            >
-              {topic.label}
-              <span>{topic.hint}</span>
-            </button>
-          );
-        })}
       </div>
 
       <div className="personalize-header">
@@ -714,7 +727,163 @@ function ResultCard({
           );
         })}
       </div>
+
+      <div className="personalize-header">
+        <SlidersHorizontal aria-hidden="true" size={18} />
+        <span>Tune the next quiz</span>
+      </div>
+      <div className="topic-grid">
+        {topicOptions.map((topic) => {
+          const active = selectedTopics.includes(topic.id);
+
+          return (
+            <button
+              aria-pressed={active}
+              className={`topic-toggle ${active ? "active" : ""}`}
+              key={topic.id}
+              onClick={() => onToggleTopic(topic.id)}
+              type="button"
+            >
+              {topic.label}
+              <span>{topic.hint}</span>
+            </button>
+          );
+        })}
+      </div>
     </section>
+  );
+}
+
+interface LocalHomeScreenProps {
+  activePack: QuizPack;
+  answeredCount: number;
+  fixture?: PredictionFixture;
+  isComplete: boolean;
+  profileSummary: LocalProfileSummary;
+  savedPrediction?: ScorePrediction;
+  totalQuestions: number;
+  onNavigate: (view: AppView) => void;
+}
+
+function LocalHomeScreen({
+  activePack,
+  answeredCount,
+  fixture,
+  isComplete,
+  profileSummary,
+  savedPrediction,
+  totalQuestions,
+  onNavigate,
+}: LocalHomeScreenProps) {
+  const quizProgressLabel = isComplete
+    ? "Pack complete"
+    : `${answeredCount}/${totalQuestions} questions`;
+  const savedPickLabel =
+    savedPrediction && fixture
+      ? `${fixture.homeTeam.shortName} ${savedPrediction.score.home}-${savedPrediction.score.away} ${fixture.awayTeam.shortName}`
+      : "No pick saved";
+  const fixtureLabel = fixture
+    ? `${fixture.homeTeam.shortName} vs ${fixture.awayTeam.shortName}`
+    : "Fixture pending";
+
+  return (
+    <section className="home-screen" aria-label="Local home">
+      <div className="league-topline home-topline">
+        <span className="score-pill home-pill">
+          <Home aria-hidden="true" size={15} />
+          Local hub
+        </span>
+        <span className="locked-pill">
+          <Shield aria-hidden="true" size={14} />
+          Device only
+        </span>
+      </div>
+
+      <div className="home-hero">
+        <div>
+          <p>Matchday control</p>
+          <h2>Matchday Hub</h2>
+          <strong>{activePack.title}</strong>
+        </div>
+        <div
+          className="home-hero-badge"
+          aria-label={profileSummary.playerBenchmark.label}
+        >
+          <Trophy aria-hidden="true" size={22} />
+          <span>{profileSummary.playerBenchmark.shortLabel}</span>
+        </div>
+      </div>
+
+      <section className="home-shortcuts" aria-label="Home shortcuts">
+        <HomeShortcut
+          copy={`${activePack.subtitle} / ${quizProgressLabel}`}
+          icon={Play}
+          label="Continue quiz"
+          onOpen={() => onNavigate("play")}
+          value={isComplete ? "Result" : "Play"}
+        />
+        <HomeShortcut
+          copy={`${profileSummary.playerBenchmark.label} / ${profileSummary.historyLabel}`}
+          icon={User}
+          label="Fan profile"
+          onOpen={() => onNavigate("profile")}
+          value={profileSummary.level}
+        />
+        <HomeShortcut
+          copy={`${fixtureLabel} / ${savedPickLabel}`}
+          icon={BarChart3}
+          label="Score League"
+          onOpen={() => onNavigate("leaderboard")}
+          value="Rewards locked"
+        />
+      </section>
+
+      <section className="home-data-card" aria-label="Local data status">
+        <div>
+          <span>Mock data</span>
+          <strong>Provider boundary ready</strong>
+          <p>
+            Fixtures, players, picks, images, and freshness labels stay local.
+          </p>
+        </div>
+        <Shield aria-hidden="true" size={26} />
+      </section>
+    </section>
+  );
+}
+
+function HomeShortcut({
+  copy,
+  icon: Icon,
+  label,
+  value,
+  onOpen,
+}: {
+  copy: string;
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  onOpen: () => void;
+}) {
+  return (
+    <article className="home-shortcut-row">
+      <div className="home-shortcut-icon" aria-hidden="true">
+        <Icon size={18} />
+      </div>
+      <div className="home-shortcut-copy">
+        <h3>{label}</h3>
+        <p>{copy}</p>
+      </div>
+      <button
+        aria-label={`Open ${label}`}
+        className="home-shortcut-button"
+        onClick={onOpen}
+        type="button"
+      >
+        <span>{value}</span>
+        <ChevronRight aria-hidden="true" size={15} />
+      </button>
+    </article>
   );
 }
 
@@ -947,6 +1116,7 @@ interface LocalProfileSummary {
   historyLabel: string;
   latestAttemptLabel: string;
   level: FanProfile["level"];
+  playerBenchmark: PlayerBenchmark;
   strongestSignals: string[];
   topicCount: number;
   totalQuestions: number;
@@ -1007,6 +1177,10 @@ function LocalProfileScreen({
 
       <div className="profile-stat-grid" aria-label="Local profile stats">
         <ProfileStat
+          label="Vs players"
+          value={profileSummary.playerBenchmark.shortLabel}
+        />
+        <ProfileStat
           label="Quiz accuracy"
           value={`${profileSummary.accuracy}%`}
         />
@@ -1018,7 +1192,6 @@ function LocalProfileScreen({
           label="Prediction pts"
           value={`${localPredictionEntry?.points ?? 0}`}
         />
-        <ProfileStat label="Correct" value={`${profileSummary.correctCount}`} />
       </div>
 
       <section className="profile-section" aria-label="Strongest signals">
@@ -1115,6 +1288,7 @@ function buildLocalProfileSummary({
   completedAttempts,
   isComplete,
   outcome,
+  playerBenchmark,
   profile,
   totalQuestions,
 }: {
@@ -1123,6 +1297,7 @@ function buildLocalProfileSummary({
   completedAttempts: LocalQuizAttempt[];
   isComplete: boolean;
   outcome: QuizOutcome;
+  playerBenchmark: PlayerBenchmark;
   profile: FanProfile;
   totalQuestions: number;
 }): LocalProfileSummary {
@@ -1135,6 +1310,7 @@ function buildLocalProfileSummary({
         historyLabel: "1 completed pack",
         latestAttemptLabel: `${activePackTitle} / ${outcome.correctCount}/${outcome.totalQuestions}`,
         level: profile.level,
+        playerBenchmark,
         strongestSignals: profile.strongestSignals,
         topicCount: profile.selectedTopics.length,
         totalQuestions,
@@ -1148,6 +1324,7 @@ function buildLocalProfileSummary({
       historyLabel: "No completed packs",
       latestAttemptLabel: "Finish a quiz to start history",
       level: profile.level,
+      playerBenchmark,
       strongestSignals: profile.strongestSignals,
       topicCount: profile.selectedTopics.length,
       totalQuestions,
@@ -1179,6 +1356,7 @@ function buildLocalProfileSummary({
     }`,
     latestAttemptLabel: `${latestAttempt.packTitle} / ${latestAttempt.correctCount}/${latestAttempt.totalQuestions}`,
     level: latestAttempt.level,
+    playerBenchmark: buildPlayerBenchmark(correctCount / historyQuestions),
     strongestSignals: getUniqueSignals(completedAttempts),
     topicCount: profile.selectedTopics.length,
     totalQuestions: historyQuestions,
@@ -1417,7 +1595,7 @@ function BottomNav({
   onNavigate: (view: AppView) => void;
 }) {
   const items = [
-    { label: "Home", icon: Home, view: "play" as const },
+    { label: "Home", icon: Home, view: "home" as const },
     { label: "Play", icon: Play, view: "play" as const },
     { label: "Leaderboard", icon: BarChart3, view: "leaderboard" as const },
     { label: "Profile", icon: User, view: "profile" as const },
@@ -1427,10 +1605,7 @@ function BottomNav({
     <nav className="bottom-nav" aria-label="Prototype navigation">
       {items.map((item) => {
         const Icon = item.icon;
-        const active =
-          (item.label === "Play" && activeView === "play") ||
-          (item.label === "Leaderboard" && activeView === "leaderboard") ||
-          (item.label === "Profile" && activeView === "profile");
+        const active = item.view === activeView;
 
         return (
           <button

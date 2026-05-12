@@ -39,6 +39,7 @@ Use committed mock data for:
 - Transfer-style stories.
 - Market-value-style comparisons.
 - Quiz questions.
+- A local player benchmark cohort for "better than X% of players" result messaging.
 - Personalization recommendations.
 
 The mock data must still look like real product data. It should have source labels, freshness windows, difficulty, categories, and tags so the eventual real data integration can replace it without rewriting the app.
@@ -46,6 +47,8 @@ The mock data must still look like real product data. It should have source labe
 Normal mock quiz questions should include media because the intended quiz format is image-led. The model must still allow `media` to be absent, and the UI must render a deliberate photoless fallback.
 
 The quiz UI should show source and freshness labels even while everything is mocked, so testers do not mistake local placeholder content for real current football data.
+
+Result messaging should avoid arbitrary point scores. While the app is local-only, results may compare the user against a mocked player benchmark cohort. That mock cohort must be replaceable by real user cohort data later.
 
 ## Current Mock Coverage
 
@@ -56,6 +59,7 @@ The local mock layer now includes:
 - Image-led questions for the preferred visual loop.
 - Text-only questions for provider, licensing, or missing-photo cases.
 - A local next-pack handoff from the first-run result screen into Weekly Pulse.
+- A player-relative result benchmark, such as `Better than X% of players`, instead of meaningless score totals.
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.
 - A local completed-quiz history so the profile still reflects prior finished packs after the user starts the next quiz.
