@@ -44,6 +44,8 @@ If media is missing, the UI must show an intentional fallback state.
 
 Every current-football question needs freshness metadata.
 
+The quiz screen must show that metadata compactly while the app is using local mocks, so testers can see whether a question is historical, mock weekly content, provider-required content, or eventually live provider content.
+
 Required fields:
 
 - Source label.

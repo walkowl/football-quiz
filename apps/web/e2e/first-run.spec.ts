@@ -12,6 +12,11 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   await expect(
     page.getByRole("img", { name: /football legend/i }),
   ).toBeVisible();
+  const dataStatus = page.getByRole("group", {
+    name: "Question data status",
+  });
+  await expect(dataStatus).toContainText("Mock week");
+  await expect(dataStatus).toContainText("Replace before beta");
 
   await page.getByRole("button", { name: "Cristiano Ronaldo" }).tap();
   await expect(page.getByTestId("feedback")).toContainText("Correct");

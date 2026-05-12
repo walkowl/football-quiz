@@ -8,6 +8,9 @@ describe("QuizExperience", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
 
+    expect(
+      screen.getByRole("group", { name: "Question data status" }),
+    ).toHaveTextContent("Mock week");
     expect(screen.getByTestId("feedback")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: /Next question/ })).toBeEnabled();
   });
@@ -89,11 +92,20 @@ describe("QuizExperience", () => {
   });
 
   it("renders a deliberate fallback when question media is missing", () => {
-    render(<QuestionMedia category="Market value" />);
+    render(
+      <QuestionMedia
+        category="Market value"
+        freshness={{ label: "Mock valuation", validUntil: "Provider required" }}
+        source={{ kind: "mock", label: "Local mock data" }}
+      />,
+    );
 
     expect(
       screen.getByRole("img", { name: "No question photo available" }),
     ).toHaveTextContent("Text-only question");
     expect(screen.getByText("Market value")).toBeInTheDocument();
+    expect(
+      screen.getByRole("group", { name: "Question data status" }),
+    ).toHaveTextContent("Provider required");
   });
 });

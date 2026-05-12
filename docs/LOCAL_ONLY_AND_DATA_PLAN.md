@@ -45,6 +45,8 @@ The mock data must still look like real product data. It should have source labe
 
 Normal mock quiz questions should include media because the intended quiz format is image-led. The model must still allow `media` to be absent, and the UI must render a deliberate photoless fallback.
 
+The quiz UI should show source and freshness labels even while everything is mocked, so testers do not mistake local placeholder content for real current football data.
+
 ## Current Mock Coverage
 
 The local mock layer now includes:

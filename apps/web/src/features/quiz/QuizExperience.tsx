@@ -210,7 +210,12 @@ function QuestionCard({
 
   return (
     <section className="quiz-card" aria-label="Current question">
-      <QuestionMedia category={question.category} media={question.media} />
+      <QuestionMedia
+        category={question.category}
+        freshness={question.freshness}
+        media={question.media}
+        source={question.source}
+      />
 
       <p className="question-kicker">
         {question.difficulty} / {question.category}
@@ -286,10 +291,14 @@ function QuestionCard({
 
 export function QuestionMedia({
   category = "Question",
+  freshness,
   media,
+  source,
 }: {
   category?: string;
+  freshness?: QuizQuestion["freshness"];
   media?: QuizMedia;
+  source?: QuizQuestion["source"];
 }) {
   if (!media) {
     return (
@@ -298,6 +307,7 @@ export function QuestionMedia({
         role="img"
         aria-label="No question photo available"
       >
+        <QuestionDataBadges freshness={freshness} source={source} />
         <Shield aria-hidden="true" size={34} />
         <span>Text-only question</span>
         <small>{category}</small>
@@ -313,8 +323,29 @@ export function QuestionMedia({
         sizes="(max-width: 520px) 100vw, 360px"
         src={media.src}
       />
+      <QuestionDataBadges freshness={freshness} source={source} />
       <figcaption>{media.credit}</figcaption>
     </figure>
+  );
+}
+
+function QuestionDataBadges({
+  freshness,
+  source,
+}: {
+  freshness?: QuizQuestion["freshness"];
+  source?: QuizQuestion["source"];
+}) {
+  if (!freshness || !source) {
+    return null;
+  }
+
+  return (
+    <div className="data-badges" role="group" aria-label="Question data status">
+      <span>{source.label}</span>
+      <span>{freshness.label}</span>
+      <span>{freshness.validUntil}</span>
+    </div>
   );
 }
 
