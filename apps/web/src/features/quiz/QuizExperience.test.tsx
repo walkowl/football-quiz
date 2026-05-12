@@ -209,9 +209,14 @@ describe("QuizExperience", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Open for picks")).toBeInTheDocument();
     expect(screen.getByText("Locks May 16, 06:45 PM UTC")).toBeInTheDocument();
+    expect(screen.getByLabelText("Standing")).toHaveTextContent("No pick");
+    expect(screen.getByText("Better than 67%")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Rank 1 .* 1 exact .* 2 outcome/),
+    ).toBeInTheDocument();
     expect(screen.getAllByText("Rewards locked").length).toBeGreaterThan(0);
     expect(
-      screen.queryByText(/bet|odds|wager|payout|cash/i),
+      screen.queryByText(/\b(bet|betting|odds|wager|payout|cash)\b/i),
     ).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Napoli score"), {
@@ -223,6 +228,8 @@ describe("QuizExperience", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
 
     expect(screen.getByText("Saved 2-1 locally")).toBeInTheDocument();
+    expect(screen.getByLabelText("Standing")).toHaveTextContent("Pending");
+    expect(screen.getByText("Pending result.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
   });
 
@@ -238,6 +245,9 @@ describe("QuizExperience", () => {
       screen.getByLabelText("Overall players Benchmark pending"),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Questions 0/3")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Prediction rank No pick"),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
       "No local pick saved",
     );
@@ -365,7 +375,9 @@ describe("QuizExperience", () => {
     expect(screen.getByLabelText("Local prediction summary")).toHaveTextContent(
       "NAP 3-0 INT",
     );
-    expect(screen.getByLabelText("Prediction pts 0")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Prediction rank Pending"),
+    ).toBeInTheDocument();
   });
 
   it("renders a deliberate fallback when question media is missing", () => {

@@ -95,6 +95,7 @@ The project now has a local-only prediction domain foundation:
 - A local save flow for the current user that persists only in browser storage on this device.
 - A local edit and clear flow for correcting or removing the device-saved pick.
 - Lock-window status based on fixture lock time, with save/update blocked once locked.
+- Player-relative standing copy, such as `Better than X%`, instead of presenting raw points as the main reward signal.
 - UI copy that keeps rewards explicitly locked until compliance work exists.
 
 This is not a rewards system. It has no paid entry, prizes, balances, payouts, odds, or wager mechanics.

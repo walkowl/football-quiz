@@ -131,7 +131,9 @@ describe("prediction domain", () => {
         points: 8,
         exactScores: 1,
         correctOutcomes: 2,
-        scoredPredictions: 2,
+        settledPicks: 2,
+        rank: 1,
+        betterThan: 67,
       },
       {
         userId: "ada",
@@ -139,7 +141,9 @@ describe("prediction domain", () => {
         points: 5,
         exactScores: 1,
         correctOutcomes: 1,
-        scoredPredictions: 2,
+        settledPicks: 2,
+        rank: 2,
+        betterThan: 33,
       },
       {
         userId: "maya",
@@ -147,8 +151,41 @@ describe("prediction domain", () => {
         points: 3,
         exactScores: 0,
         correctOutcomes: 1,
-        scoredPredictions: 1,
+        settledPicks: 1,
+        rank: 3,
+        betterThan: 0,
       },
+    ]);
+  });
+
+  it("does not count tied prediction entries as beaten players", () => {
+    const tiedLeaderboard = buildPredictionLeaderboard({
+      fixtures: [completedFixture],
+      members: [
+        { userId: "ada", displayName: "Ada" },
+        { userId: "leo", displayName: "Leo" },
+      ],
+      predictions: [
+        mustFindPrediction("pred-ada-ars-tot"),
+        {
+          ...mustFindPrediction("pred-ada-ars-tot"),
+          id: "pred-leo-copy",
+          userId: "leo",
+        },
+      ],
+    });
+
+    expect(tiedLeaderboard).toEqual([
+      expect.objectContaining({
+        userId: "ada",
+        rank: 1,
+        betterThan: 0,
+      }),
+      expect.objectContaining({
+        userId: "leo",
+        rank: 1,
+        betterThan: 0,
+      }),
     ]);
   });
 

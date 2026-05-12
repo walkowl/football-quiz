@@ -112,14 +112,20 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   );
   await expect(page.getByText("Open for picks")).toBeVisible();
   await expect(page.getByText("Locks May 16, 06:45 PM UTC")).toBeVisible();
+  await expect(page.getByLabel("Standing")).toContainText("No pick");
+  await expect(page.getByText("Better than 67%")).toBeVisible();
 
   await page.getByLabel("Napoli score").fill("2");
   await page.getByLabel("Inter score").fill("1");
   await page.getByRole("button", { name: "Save prediction" }).tap();
 
   await expect(page.getByText("Saved 2-1 locally")).toBeVisible();
+  await expect(page.getByLabel("Standing")).toContainText("Pending");
+  await expect(page.getByText("Pending result.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "You" })).toBeVisible();
-  await expect(page.getByText(/bet|odds|wager|payout|cash/i)).toHaveCount(0);
+  await expect(
+    page.getByText(/\b(bet|betting|odds|wager|payout|cash)\b/i),
+  ).toHaveCount(0);
 
   await page.reload();
   await page.getByRole("button", { name: "Leaderboard" }).tap();
@@ -146,10 +152,6 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await page.getByRole("button", { name: "Leaderboard" }).tap();
   await expect(page.getByText("Restored 3-1 from this device")).toHaveCount(0);
 
-  await page.locator(".screen-content").evaluate((element) => {
-    element.scrollTop = element.scrollHeight;
-  });
-  await expect(page.getByText("ARS / TOT")).toBeVisible();
   await expect(page.getByRole("button", { name: "Leaderboard" })).toBeVisible();
 });
 
@@ -179,7 +181,7 @@ test("profile tab summarizes local quiz and prediction state", async ({
   await expect(page.getByLabel("Local prediction summary")).toContainText(
     "NAP 2-1 INT",
   );
-  await expect(page.getByLabel("Prediction pts 0")).toBeVisible();
+  await expect(page.getByLabel("Prediction rank Pending")).toBeVisible();
 });
 
 test("home hub routes between local mobile surfaces", async ({ page }) => {

@@ -76,7 +76,9 @@ export interface PredictionLeagueEntry {
   points: number;
   exactScores: number;
   correctOutcomes: number;
-  scoredPredictions: number;
+  settledPicks: number;
+  rank: number;
+  betterThan: number;
 }
 
 export interface PredictionLockState {
@@ -163,7 +165,7 @@ export function buildPredictionLeaderboard({
   predictions: ScorePrediction[];
   rules?: PredictionScoringRules;
 }): PredictionLeagueEntry[] {
-  return members
+  const entries = members
     .map((member) => {
       const results = fixtures.flatMap((fixture) => {
         const prediction = selectLatestPredictionBeforeLock(
@@ -181,12 +183,29 @@ export function buildPredictionLeaderboard({
         exactScores: results.filter((result) => result.exactScore).length,
         correctOutcomes: results.filter((result) => result.correctOutcome)
           .length,
-        scoredPredictions: results.filter(
-          (result) => result.status === "scored",
-        ).length,
+        settledPicks: results.filter((result) => result.status === "scored")
+          .length,
       };
     })
     .sort(compareLeaderboardEntries);
+
+  return entries.map((entry) => {
+    const betterEntries = entries.filter(
+      (candidate) => compareStrength(candidate, entry) < 0,
+    ).length;
+    const worseEntries = entries.filter(
+      (candidate) => compareStrength(entry, candidate) < 0,
+    ).length;
+
+    return {
+      ...entry,
+      rank: betterEntries + 1,
+      betterThan:
+        entries.length > 0
+          ? Math.round((worseEntries / entries.length) * 100)
+          : 0,
+    };
+  });
 }
 
 export function getScoreOutcome(score: ScoreLine): ScoreOutcome {
@@ -260,14 +279,35 @@ function selectLatestPredictionBeforeLock(
 }
 
 function compareLeaderboardEntries(
-  left: PredictionLeagueEntry,
-  right: PredictionLeagueEntry,
+  left: Pick<
+    PredictionLeagueEntry,
+    "correctOutcomes" | "displayName" | "exactScores" | "points"
+  >,
+  right: Pick<
+    PredictionLeagueEntry,
+    "correctOutcomes" | "displayName" | "exactScores" | "points"
+  >,
+) {
+  return (
+    compareStrength(left, right) ||
+    left.displayName.localeCompare(right.displayName)
+  );
+}
+
+function compareStrength(
+  left: Pick<
+    PredictionLeagueEntry,
+    "correctOutcomes" | "exactScores" | "points"
+  >,
+  right: Pick<
+    PredictionLeagueEntry,
+    "correctOutcomes" | "exactScores" | "points"
+  >,
 ) {
   return (
     right.points - left.points ||
     right.exactScores - left.exactScores ||
-    right.correctOutcomes - left.correctOutcomes ||
-    left.displayName.localeCompare(right.displayName)
+    right.correctOutcomes - left.correctOutcomes
   );
 }
 

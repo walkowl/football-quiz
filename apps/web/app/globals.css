@@ -1230,6 +1230,44 @@ button {
   flex: 0 0 auto;
 }
 
+.prediction-standing-card {
+  border: 1px solid rgba(29, 184, 102, 0.34);
+  border-radius: 15px;
+  background: rgba(29, 184, 102, 0.1);
+  padding: 10px 12px;
+}
+
+.prediction-standing-card span,
+.prediction-standing-card strong,
+.prediction-standing-card p {
+  margin: 0;
+}
+
+.prediction-standing-card span {
+  color: #8cffbd;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prediction-standing-card strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.prediction-standing-card p {
+  margin-top: 3px;
+  color: rgba(246, 244, 238, 0.58);
+  font-size: 0.68rem;
+  font-weight: 740;
+  line-height: 1.25;
+}
+
 .prediction-panel {
   display: grid;
   gap: 11px;
@@ -1447,15 +1485,13 @@ button {
   white-space: nowrap;
 }
 
-.leaderboard-list,
-.fixture-list {
+.leaderboard-list {
   display: grid;
   gap: 8px;
   margin-top: 8px;
 }
 
-.leaderboard-row,
-.fixture-row {
+.leaderboard-row {
   display: grid;
   align-items: center;
   gap: 10px;
@@ -1467,10 +1503,6 @@ button {
 
 .leaderboard-row {
   grid-template-columns: 30px minmax(0, 1fr) auto;
-}
-
-.fixture-row {
-  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .rank {
@@ -1486,14 +1518,11 @@ button {
 }
 
 .leaderboard-row h3,
-.leaderboard-row p,
-.fixture-row h3,
-.fixture-row p {
+.leaderboard-row p {
   margin: 0;
 }
 
-.leaderboard-row h3,
-.fixture-row h3 {
+.leaderboard-row h3 {
   overflow: hidden;
   color: var(--ink);
   font-size: 0.86rem;
@@ -1502,19 +1531,18 @@ button {
   white-space: nowrap;
 }
 
-.leaderboard-row p,
-.fixture-row p {
+.leaderboard-row p {
   margin-top: 2px;
   color: rgba(246, 244, 238, 0.56);
   font-size: 0.68rem;
   font-weight: 720;
 }
 
-.leaderboard-row strong,
-.fixture-row strong {
+.leaderboard-row strong {
   color: #8cffbd;
-  font-size: 0.98rem;
+  font-size: 0.82rem;
   font-weight: 950;
+  text-align: right;
   white-space: nowrap;
 }
 

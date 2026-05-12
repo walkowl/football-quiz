@@ -378,6 +378,7 @@ export function QuizExperience() {
               answeredCount={answeredCount}
               fixture={scheduledPredictionFixture}
               isComplete={isComplete}
+              localPredictionEntry={localPredictionEntry}
               nextPack={nextHomePack}
               onNavigate={setActiveView}
               onStartPack={startPack}
@@ -389,6 +390,7 @@ export function QuizExperience() {
             <PredictionLeagueScreen
               draft={predictionUi.draft}
               fixture={scheduledPredictionFixture}
+              localPredictionEntry={localPredictionEntry}
               lockState={scheduledPredictionLockState}
               onDraftChange={(draft) =>
                 setPredictionUiOverride({
@@ -767,6 +769,7 @@ interface LocalHomeScreenProps {
   answeredCount: number;
   fixture?: PredictionFixture;
   isComplete: boolean;
+  localPredictionEntry?: PredictionLeagueEntry;
   nextPack?: RecommendedPack;
   profileSummary: LocalProfileSummary;
   savedPrediction?: ScorePrediction;
@@ -780,6 +783,7 @@ function LocalHomeScreen({
   answeredCount,
   fixture,
   isComplete,
+  localPredictionEntry,
   nextPack,
   profileSummary,
   savedPrediction,
@@ -802,6 +806,9 @@ function LocalHomeScreen({
   const fixtureLabel = fixture
     ? `${fixture.homeTeam.shortName} vs ${fixture.awayTeam.shortName}`
     : "Fixture pending";
+  const predictionShortcutValue = savedPrediction
+    ? getStandingValue(localPredictionEntry)
+    : "League";
 
   return (
     <section className="home-screen" aria-label="Local home">
@@ -853,7 +860,7 @@ function LocalHomeScreen({
           icon={BarChart3}
           label="Score League"
           onOpen={() => onNavigate("leaderboard")}
-          value="League"
+          value={predictionShortcutValue}
         />
       </section>
 
@@ -910,6 +917,7 @@ interface PredictionLeagueScreenProps {
   draft: ScoreLine;
   fixture?: PredictionFixture;
   leaderboard: PredictionLeagueEntry[];
+  localPredictionEntry?: PredictionLeagueEntry;
   lockState?: PredictionLockState;
   saveState: PredictionSaveState;
   savedPrediction?: ScorePrediction;
@@ -922,6 +930,7 @@ function PredictionLeagueScreen({
   draft,
   fixture,
   leaderboard,
+  localPredictionEntry,
   lockState,
   saveState,
   savedPrediction,
@@ -929,10 +938,13 @@ function PredictionLeagueScreen({
   onDraftChange,
   onSave,
 }: PredictionLeagueScreenProps) {
-  const completedFixtures = mockPredictionFixtures.filter(
-    (candidate) => candidate.status === "completed",
-  );
   const predictionLocked = lockState?.status === "locked";
+  const standingTitle = getStandingValue(localPredictionEntry);
+  const standingCopy = !localPredictionEntry
+    ? "Save pick."
+    : localPredictionEntry.settledPicks === 0
+      ? "Pending result."
+      : `Rank ${localPredictionEntry.rank} of ${leaderboard.length}.`;
 
   function updateDraft(side: keyof ScoreLine, value: string) {
     if (predictionLocked) {
@@ -953,7 +965,7 @@ function PredictionLeagueScreen({
   return (
     <section className="prediction-screen" aria-label="Prediction league">
       <div className="league-topline">
-        <span className="score-pill">Local league</span>
+        <span className="score-pill">Local</span>
         <span className="locked-pill">
           <Lock aria-hidden="true" size={14} />
           Rewards locked
@@ -962,11 +974,19 @@ function PredictionLeagueScreen({
 
       <div className="league-heading">
         <div>
-          <p>Mock score picks</p>
+          <p>Mock picks</p>
           <h2>Score League</h2>
         </div>
         <Medal aria-hidden="true" size={28} />
       </div>
+
+      <section className="prediction-standing-card" aria-label="Standing">
+        <div>
+          <span>Standing</span>
+          <strong>{standingTitle}</strong>
+          <p>{standingCopy}</p>
+        </div>
+      </section>
 
       <section className="prediction-panel" aria-label="Upcoming prediction">
         <div className="prediction-panel-header">
@@ -1070,8 +1090,8 @@ function PredictionLeagueScreen({
             ) : (
               <p className="saved-prediction">
                 {predictionLocked
-                  ? "Prediction window is locked for this fixture."
-                  : "Local only until the data provider boundary is ready."}
+                  ? "Prediction locked."
+                  : "Local until provider boundary."}
               </p>
             )}
           </>
@@ -1083,7 +1103,7 @@ function PredictionLeagueScreen({
       <section aria-label="Prediction leaderboard">
         <div className="prediction-section-title">
           <span>Leaderboard</span>
-          <small>Exact 5 / outcome 2 / margin 1</small>
+          <small>Exact, outcome, margin</small>
         </div>
         <div className="leaderboard-list">
           {leaderboard.map((entry, index) => (
@@ -1092,34 +1112,11 @@ function PredictionLeagueScreen({
               <div>
                 <h3>{entry.displayName}</h3>
                 <p>
-                  {entry.exactScores} exact / {entry.correctOutcomes} outcome
+                  Rank {entry.rank} / {entry.exactScores} exact /{" "}
+                  {entry.correctOutcomes} outcome
                 </p>
               </div>
-              <strong>{entry.points}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section aria-label="Settled mock fixtures">
-        <div className="prediction-section-title">
-          <span>Settled fixtures</span>
-          <small>Mock results</small>
-        </div>
-        <div className="fixture-list">
-          {completedFixtures.map((settledFixture) => (
-            <article className="fixture-row" key={settledFixture.id}>
-              <div>
-                <h3>
-                  {settledFixture.homeTeam.shortName} /{" "}
-                  {settledFixture.awayTeam.shortName}
-                </h3>
-                <p>{settledFixture.competition}</p>
-              </div>
-              <strong>
-                {settledFixture.finalScore?.home}-
-                {settledFixture.finalScore?.away}
-              </strong>
+              <strong>{getStandingValue(entry)}</strong>
             </article>
           ))}
         </div>
@@ -1208,8 +1205,8 @@ function LocalProfileScreen({
           value={`${profileSummary.answeredCount}/${profileSummary.totalQuestions}`}
         />
         <ProfileStat
-          label="Prediction pts"
-          value={`${localPredictionEntry?.points ?? 0}`}
+          label="Prediction rank"
+          value={getStandingValue(localPredictionEntry)}
         />
       </div>
 
@@ -1420,6 +1417,18 @@ function getPredictionSaveMessage(
   }
 
   return `Saved ${score} locally`;
+}
+
+function getStandingValue(entry?: PredictionLeagueEntry) {
+  if (!entry) {
+    return "No pick";
+  }
+
+  if (entry.settledPicks === 0) {
+    return "Pending";
+  }
+
+  return `Better than ${entry.betterThan}%`;
 }
 
 function scoresEqual(left: ScoreLine, right: ScoreLine) {

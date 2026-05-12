@@ -33,6 +33,8 @@ Do not show meaningless score totals. Use a player-relative benchmark such as `B
 
 When more than one benchmark appears, label the scope clearly. For example, use `This quiz` for the just-finished pack and `Overall` for the device profile/history benchmark.
 
+Prediction league surfaces should follow the same rule. Scoring rules can exist underneath for exact-score settlement, but the primary user-facing signal should be rank or `Better than X%` standing, with pending language before the user's own prediction has a settled fixture.
+
 ## Media Rule
 
 Normal quiz content should expect a photo or image.
