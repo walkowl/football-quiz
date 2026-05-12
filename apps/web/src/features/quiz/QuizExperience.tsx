@@ -16,6 +16,7 @@ import {
   Settings,
   Shield,
   SlidersHorizontal,
+  Trash2,
   Trophy,
   User,
   X,
@@ -51,6 +52,7 @@ import {
   type QuizQuestion,
 } from "../../domain/quiz";
 import {
+  clearLocalScorePrediction,
   getBrowserPredictionStorage,
   readLocalScorePrediction,
   saveLocalScorePrediction,
@@ -271,6 +273,22 @@ export function QuizExperience() {
                   savedPrediction: nextPrediction,
                   saveState,
                 }));
+              }}
+              onClear={() => {
+                if (!scheduledPredictionFixture) {
+                  return;
+                }
+
+                clearLocalScorePrediction(
+                  getBrowserPredictionStorage(),
+                  scheduledPredictionFixture.id,
+                );
+
+                setPredictionUi({
+                  draft: defaultPredictionDraft,
+                  saveState: "draft",
+                  savedPrediction: undefined,
+                });
               }}
               saveState={predictionUi.saveState}
               savedPrediction={predictionUi.savedPrediction}
@@ -580,6 +598,7 @@ interface PredictionLeagueScreenProps {
   fixture?: PredictionFixture;
   saveState: PredictionSaveState;
   savedPrediction?: ScorePrediction;
+  onClear: () => void;
   onDraftChange: (score: ScoreLine) => void;
   onSave: () => void;
 }
@@ -589,6 +608,7 @@ function PredictionLeagueScreen({
   fixture,
   saveState,
   savedPrediction,
+  onClear,
   onDraftChange,
   onSave,
 }: PredictionLeagueScreenProps) {
@@ -695,17 +715,29 @@ function PredictionLeagueScreen({
                 />
               </label>
             </div>
-            <button
-              className="primary-button prediction-save"
-              onClick={onSave}
-              type="button"
-            >
-              <Save aria-hidden="true" size={17} />
-              Save prediction
-            </button>
+            <div className="prediction-actions">
+              <button
+                className="primary-button prediction-save"
+                onClick={onSave}
+                type="button"
+              >
+                <Save aria-hidden="true" size={17} />
+                {savedPrediction ? "Update prediction" : "Save prediction"}
+              </button>
+              {savedPrediction ? (
+                <button
+                  className="clear-prediction-button"
+                  onClick={onClear}
+                  type="button"
+                >
+                  <Trash2 aria-hidden="true" size={15} />
+                  Clear local pick
+                </button>
+              ) : null}
+            </div>
             {savedPrediction ? (
               <p className="saved-prediction">
-                {getPredictionSaveMessage(savedPrediction, saveState)}
+                {getPredictionSaveMessage(draft, savedPrediction, saveState)}
               </p>
             ) : (
               <p className="saved-prediction">
@@ -767,10 +799,15 @@ function PredictionLeagueScreen({
 }
 
 function getPredictionSaveMessage(
+  draft: ScoreLine,
   prediction: ScorePrediction,
   saveState: PredictionSaveState,
 ) {
   const score = `${prediction.score.home}-${prediction.score.away}`;
+
+  if (!scoresEqual(draft, prediction.score)) {
+    return `Unsaved changes to ${draft.home}-${draft.away}`;
+  }
 
   if (saveState === "restored") {
     return `Restored ${score} from this device`;
@@ -781,6 +818,10 @@ function getPredictionSaveMessage(
   }
 
   return `Saved ${score} locally`;
+}
+
+function scoresEqual(left: ScoreLine, right: ScoreLine) {
+  return left.home === right.home && left.away === right.away;
 }
 
 function getInitialPredictionUiState(): PredictionUiState {

@@ -55,6 +55,39 @@ export function saveLocalScorePrediction(
   }
 }
 
+export function clearLocalScorePrediction(
+  storage: Storage | undefined,
+  fixtureId: string,
+) {
+  if (!storage) {
+    return false;
+  }
+
+  try {
+    const currentRecord = readRecord(storage);
+
+    if (!currentRecord) {
+      return true;
+    }
+
+    const predictionsByFixtureId = {
+      ...currentRecord.predictionsByFixtureId,
+    };
+    delete predictionsByFixtureId[fixtureId];
+
+    const nextRecord: LocalPredictionRecord = {
+      version: STORAGE_VERSION,
+      predictionsByFixtureId,
+    };
+
+    storage.setItem(STORAGE_KEY, JSON.stringify(nextRecord));
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function readRecord(storage: Storage | undefined) {
   if (!storage) {
     return undefined;

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { ScorePrediction } from "../../domain/prediction";
 import {
+  clearLocalScorePrediction,
   readLocalScorePrediction,
   saveLocalScorePrediction,
 } from "./localPredictionStorage";
@@ -53,6 +54,26 @@ describe("local prediction storage", () => {
     ).toEqual(otherPrediction);
   });
 
+  it("clears one fixture prediction without removing the rest", () => {
+    const otherPrediction: ScorePrediction = {
+      ...prediction,
+      id: "local-fixture-b",
+      fixtureId: "fixture-b",
+    };
+
+    saveLocalScorePrediction(storage, prediction);
+    saveLocalScorePrediction(storage, otherPrediction);
+
+    expect(clearLocalScorePrediction(storage, prediction.fixtureId)).toBe(true);
+
+    expect(
+      readLocalScorePrediction(storage, prediction.fixtureId),
+    ).toBeUndefined();
+    expect(
+      readLocalScorePrediction(storage, otherPrediction.fixtureId),
+    ).toEqual(otherPrediction);
+  });
+
   it("ignores corrupt, old, or malformed records", () => {
     storage.setItem("footy-guess.local-predictions.v1", "{");
     expect(
@@ -94,6 +115,9 @@ describe("local prediction storage", () => {
 
   it("reports unavailable storage without throwing", () => {
     expect(saveLocalScorePrediction(undefined, prediction)).toBe(false);
+    expect(clearLocalScorePrediction(undefined, prediction.fixtureId)).toBe(
+      false,
+    );
     expect(
       readLocalScorePrediction(undefined, prediction.fixtureId),
     ).toBeUndefined();

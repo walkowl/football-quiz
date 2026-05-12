@@ -86,6 +86,24 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(page.getByLabel("Napoli score")).toHaveValue("2");
   await expect(page.getByLabel("Inter score")).toHaveValue("1");
 
+  await page.getByLabel("Napoli score").fill("3");
+  await expect(page.getByText("Unsaved changes to 3-1")).toBeVisible();
+  await page.getByRole("button", { name: "Update prediction" }).tap();
+  await expect(page.getByText("Saved 3-1 locally")).toBeVisible();
+
+  await page.reload();
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+  await expect(page.getByText("Restored 3-1 from this device")).toBeVisible();
+
+  await page.getByRole("button", { name: "Clear local pick" }).tap();
+  await expect(page.getByRole("heading", { name: "You" })).toHaveCount(0);
+  await expect(page.getByLabel("Napoli score")).toHaveValue("1");
+  await expect(page.getByLabel("Inter score")).toHaveValue("1");
+
+  await page.reload();
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+  await expect(page.getByText("Restored 3-1 from this device")).toHaveCount(0);
+
   await page.locator(".screen-content").evaluate((element) => {
     element.scrollTop = element.scrollHeight;
   });

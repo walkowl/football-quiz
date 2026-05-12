@@ -336,6 +336,7 @@ button {
   height: 100%;
   z-index: 0;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .media-frame figcaption {
@@ -910,9 +911,43 @@ button {
   outline: none;
 }
 
-.prediction-save {
+.prediction-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.prediction-save,
+.clear-prediction-button {
   width: 100%;
   margin-top: 0;
+}
+
+.clear-prediction-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  color: rgba(246, 244, 238, 0.72);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 860;
+  padding: 0 14px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.clear-prediction-button:hover,
+.clear-prediction-button:focus-visible {
+  border-color: rgba(225, 91, 79, 0.62);
+  background: rgba(225, 91, 79, 0.13);
+  outline: none;
+  transform: translateY(-1px);
 }
 
 .saved-prediction {

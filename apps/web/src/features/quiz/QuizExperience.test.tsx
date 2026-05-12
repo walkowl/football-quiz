@@ -1,6 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { saveLocalScorePrediction } from "./localPredictionStorage";
+import {
+  readLocalScorePrediction,
+  saveLocalScorePrediction,
+} from "./localPredictionStorage";
 import { QuestionMedia, QuizExperience } from "./QuizExperience";
 
 describe("QuizExperience", () => {
@@ -125,6 +128,44 @@ describe("QuizExperience", () => {
 
     expect(screen.getByText("Saved 2-1 locally")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
+  });
+
+  it("updates and clears a local score prediction", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Leaderboard" }));
+    fireEvent.change(screen.getByLabelText("Napoli score"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText("Inter score"), {
+      target: { value: "1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
+    fireEvent.change(screen.getByLabelText("Napoli score"), {
+      target: { value: "4" },
+    });
+
+    expect(screen.getByText("Unsaved changes to 4-1")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Update prediction" }));
+
+    expect(screen.getByText("Saved 4-1 locally")).toBeInTheDocument();
+    expect(
+      readLocalScorePrediction(storage, "mock-serie-a-nap-int-2026-05-16")
+        ?.score,
+    ).toEqual({
+      home: 4,
+      away: 1,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear local pick" }));
+
+    expect(screen.queryByRole("heading", { name: "You" })).toBeNull();
+    expect(screen.getByLabelText("Napoli score")).toHaveValue(1);
+    expect(screen.getByLabelText("Inter score")).toHaveValue(1);
+    expect(
+      readLocalScorePrediction(storage, "mock-serie-a-nap-int-2026-05-16"),
+    ).toBeUndefined();
   });
 
   it("restores a locally saved score prediction on load", async () => {
