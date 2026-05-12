@@ -7,6 +7,8 @@ const sourceFiles = [
   "apps/web/app/layout.tsx",
   "apps/web/app/page.tsx",
   "apps/web/src/data/mockFootballData.ts",
+  "apps/web/src/data/mockPredictionData.ts",
+  "apps/web/src/domain/prediction.ts",
   "apps/web/src/domain/quiz.ts",
   "apps/web/src/features/quiz/QuizExperience.tsx",
 ];

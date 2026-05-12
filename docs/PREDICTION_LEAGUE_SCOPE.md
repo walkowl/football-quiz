@@ -80,3 +80,16 @@ Build this in stages:
 4. Add a local-only prediction league prototype with no real rewards.
 5. Evaluate legal/compliance requirements for any money or money-like reward.
 6. Only then consider accounts, payments, payouts, or sponsored rewards.
+
+## Current Local Foundation
+
+The project now has a local-only prediction domain foundation:
+
+- Mock fixtures and final results.
+- Mock score predictions.
+- Lock-time enforcement.
+- Exact-score, outcome, and goal-difference scoring.
+- Pending, void, locked, and scored states.
+- Leaderboard ranking with tiebreakers.
+
+This is not a rewards system. It has no paid entry, prizes, balances, payouts, odds, or wager mechanics.

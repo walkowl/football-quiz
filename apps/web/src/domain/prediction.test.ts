@@ -1,0 +1,161 @@
+import { describe, expect, it } from "vitest";
+import {
+  mockPredictionFixtures,
+  mockPredictionMembers,
+  mockScorePredictions,
+} from "../data/mockPredictionData";
+import {
+  buildPredictionLeaderboard,
+  getScoreOutcome,
+  scorePrediction,
+  type PredictionFixture,
+  type ScorePrediction,
+} from "./prediction";
+
+const completedFixture = mustFindFixture("mock-pl-ars-tot-2026-05-09");
+
+describe("prediction domain", () => {
+  it("scores an exact match prediction", () => {
+    const prediction = mustFindPrediction("pred-ada-ars-tot");
+    const result = scorePrediction(completedFixture, prediction);
+
+    expect(result).toMatchObject({
+      status: "scored",
+      points: 5,
+      exactScore: true,
+      correctOutcome: true,
+      correctGoalDifference: true,
+    });
+  });
+
+  it("scores correct outcome and goal difference without exact score", () => {
+    const prediction = mustFindPrediction("pred-leo-ars-tot");
+    const result = scorePrediction(completedFixture, prediction);
+
+    expect(result).toMatchObject({
+      status: "scored",
+      points: 3,
+      exactScore: false,
+      correctOutcome: true,
+      correctGoalDifference: true,
+    });
+  });
+
+  it("keeps scheduled fixtures pending until a final score exists", () => {
+    const scheduledFixture = mustFindFixture("mock-serie-a-nap-int-2026-05-16");
+    const prediction = mustFindPrediction("pred-maya-nap-int");
+
+    expect(scorePrediction(scheduledFixture, prediction)).toMatchObject({
+      status: "pending",
+      points: 0,
+      reason: "Fixture is not complete yet.",
+    });
+  });
+
+  it("voids postponed and cancelled fixtures", () => {
+    const prediction = mustFindPrediction("pred-maya-nap-int");
+    const postponedFixture: PredictionFixture = {
+      ...mustFindFixture("mock-serie-a-nap-int-2026-05-16"),
+      status: "postponed",
+    };
+
+    expect(scorePrediction(postponedFixture, prediction)).toMatchObject({
+      status: "void",
+      points: 0,
+      reason: "Fixture was not settled.",
+    });
+  });
+
+  it("rejects predictions submitted at or after lock time", () => {
+    const latePrediction: ScorePrediction = {
+      id: "pred-late",
+      userId: "ada",
+      fixtureId: completedFixture.id,
+      submittedAt: completedFixture.lockAt,
+      score: {
+        home: 2,
+        away: 1,
+      },
+    };
+
+    expect(scorePrediction(completedFixture, latePrediction)).toMatchObject({
+      status: "locked",
+      points: 0,
+      reason: "Prediction was submitted after the lock time.",
+    });
+  });
+
+  it("builds a points leaderboard with transparent tiebreakers", () => {
+    const leaderboard = buildPredictionLeaderboard({
+      fixtures: mockPredictionFixtures,
+      members: mockPredictionMembers,
+      predictions: mockScorePredictions,
+    });
+
+    expect(leaderboard).toEqual([
+      {
+        userId: "leo",
+        displayName: "Leo",
+        points: 8,
+        exactScores: 1,
+        correctOutcomes: 2,
+        scoredPredictions: 2,
+      },
+      {
+        userId: "ada",
+        displayName: "Ada",
+        points: 5,
+        exactScores: 1,
+        correctOutcomes: 1,
+        scoredPredictions: 2,
+      },
+      {
+        userId: "maya",
+        displayName: "Maya",
+        points: 3,
+        exactScores: 0,
+        correctOutcomes: 1,
+        scoredPredictions: 1,
+      },
+    ]);
+  });
+
+  it("derives match outcomes without odds or wager language", () => {
+    expect(getScoreOutcome({ home: 2, away: 1 })).toBe("home");
+    expect(getScoreOutcome({ home: 1, away: 1 })).toBe("draw");
+    expect(getScoreOutcome({ home: 0, away: 3 })).toBe("away");
+  });
+
+  it("throws when scoring a prediction against the wrong fixture", () => {
+    const wrongFixture = mustFindFixture("mock-ucl-mci-rma-2026-05-10");
+    const prediction = mustFindPrediction("pred-ada-ars-tot");
+
+    expect(() => scorePrediction(wrongFixture, prediction)).toThrow(
+      "Prediction fixture mismatch",
+    );
+  });
+});
+
+function mustFindFixture(id: string) {
+  const fixture = mockPredictionFixtures.find(
+    (candidate) => candidate.id === id,
+  );
+
+  if (!fixture) {
+    throw new Error(`Missing fixture ${id}`);
+  }
+
+  return fixture;
+}
+
+function mustFindPrediction(id: string) {
+  const prediction = mockScorePredictions.find(
+    (candidate) => candidate.id === id,
+  );
+
+  if (!prediction) {
+    throw new Error(`Missing prediction ${id}`);
+  }
+
+  return prediction;
+}
