@@ -83,6 +83,31 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   ).toBeVisible();
 });
 
+test("real pointer click selects a first-screen answer", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  const answer = page.getByRole("button", { name: "Cristiano Ronaldo" });
+  await expect(answer).toBeVisible();
+
+  const box = await answer.boundingBox();
+  expect(box).not.toBeNull();
+
+  if (!box) {
+    throw new Error("Cristiano Ronaldo answer has no clickable box");
+  }
+
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+
+  await expect(page.getByTestId("feedback")).toContainText("Correct");
+  await expect(page.getByLabel("33% complete")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Next question/ }),
+  ).toBeEnabled();
+});
+
 test("home screen has no serious accessibility violations", async ({
   page,
 }) => {

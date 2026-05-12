@@ -40,13 +40,13 @@ npm run dev
 
 Open `http://localhost:3000` and use your browser's mobile device mode to click through the mobile experience without installing anything on a phone.
 
-To open it from a phone on the same Wi-Fi network without installing an app:
+To open it from a phone on the same Wi-Fi network without installing an app, use the production LAN preview:
 
 ```sh
-npm run dev:web:lan
+npm run preview:web:lan
 ```
 
-Then open `http://<your-mac-ip>:3000` from the phone browser.
+Then open `http://<your-mac-ip>:3001` from the phone browser. Use this production preview for phone click-through testing; the Next.js development server can fail to hydrate correctly over LAN when its hot-reload WebSocket is blocked.
 
 ## Source Brief
 

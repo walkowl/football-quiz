@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "npm run lint -w apps/web",
+    "preview:web:lan": "npm run build -w apps/web && npm run start:lan -w apps/web -- -p 3001",
     "quality:architecture": "node tools/quality/architecture-check.mjs",
     "quality:bundle": "node tools/quality/bundle-budget.mjs",
     "quality": "tools/quality/check.sh",

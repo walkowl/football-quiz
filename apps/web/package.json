@@ -8,6 +8,7 @@
     "dev:lan": "next dev --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "start": "next start",
+    "start:lan": "next start -H 0.0.0.0",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",

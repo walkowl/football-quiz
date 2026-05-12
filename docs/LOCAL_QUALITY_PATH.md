@@ -25,6 +25,7 @@ For the current web prototype, the gate runs:
 - Vitest unit and component tests.
 - Coverage threshold checks.
 - Playwright mobile browser E2E tests.
+- A first-screen real pointer-coordinate click test so visual hover without hydrated click handlers is caught.
 - Playwright visual regression screenshot for the approved mobile phone frame.
 - Basic automated accessibility scan.
 - Next.js production build.
@@ -66,3 +67,13 @@ When implementation starts, the local gate should include:
 The local repository has a pre-push hook installed at `.git/hooks/pre-push`. It runs the local gate before allowing a push.
 
 Because `.git/hooks` is not versioned, this hook is local to this checkout. If the repository is cloned elsewhere, install the same policy there before pushing from that checkout.
+
+## Phone Preview
+
+Use the production LAN preview for real phone click-through testing:
+
+```sh
+npm run preview:web:lan
+```
+
+Then open `http://<your-mac-ip>:3001` on the phone. Do not use `next dev` as the phone preview path; its hot-reload WebSocket can fail over LAN and leave the page visually rendered but not hydrated.
