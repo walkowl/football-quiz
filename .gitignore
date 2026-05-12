@@ -1,0 +1,29 @@
+.DS_Store
+
+# IDEs and local machine state
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+build/
+dist/
+out/
+.gradle/
+
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Local-only automation
+.local-quality/
+
+# Logs and reports
+*.log
+coverage/
+reports/

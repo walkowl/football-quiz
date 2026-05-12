@@ -1,0 +1,200 @@
+﻿Football Quiz App — Initial Product and Engineering Brief
+1. Product Vision
+The app is a football quiz experience designed to hook users as quickly as possible.
+The first experience must be fast, lightweight, and engaging. A new user should be able to open the app and start answering quiz questions immediately, without needing to create an account, log in, provide an email address, or go through a long onboarding flow.
+The goal is simple:
+Get the user into the app as fast as possible and make them feel that the app understands their football knowledge, favourite leagues, and level of interest.
+2. First-Time User Experience
+When the user opens the app for the first time, the app should immediately guide them into a short and engaging quiz flow.
+The first session should avoid friction. There should be no mandatory login, no email requirement, and no heavy setup before the user experiences the core value of the app.
+A possible first-time flow:
+1. User opens the app.
+2. User is shown a very short football quiz immediately.
+3. The quiz contains around three questions:
+   * Question 1: easy
+   * Question 2: medium
+   * Question 3: advanced
+4. Based on the user’s answers, the app estimates their football knowledge level.
+5. The app then suggests leagues, teams, players, or topics that may interest them.
+6. The app asks lightweight personalization questions only after the user is already engaged.
+The app should feel intelligent from the first interaction.
+3. Onboarding Goals
+The onboarding should be optimized for user engagement and retention.
+The app should quickly discover:
+* Which football leagues the user follows
+* Which national team or country they care about
+* How knowledgeable they are
+* Whether they are a casual fan or a serious follower
+* Which types of quiz questions they enjoy
+* Whether they are interested in transfers, player values, goals, gossip, or league tables
+The onboarding should not feel like a form. It should feel like part of the game.
+4. User Knowledge Levels
+The app should classify users into simple football knowledge levels.
+Possible levels:
+* Newbie — knows famous players and clubs but does not follow football deeply
+* Casual Fan — watches major matches and follows some big teams or players
+* Intermediate Fan — follows one or more leagues regularly
+* Daily Follower — keeps up with results, transfers, tables, and player news
+* Advanced Fan — understands multiple leagues, player form, transfers, tactics, and current football context
+The app should adapt question difficulty based on the user’s level.
+5. Personalization
+The app should personalize the experience around the user’s interests.
+Important personalization signals:
+* User’s country or nationality
+* Favourite league
+* Favourite club
+* Favourite players
+* Knowledge level
+* Recent quiz performance
+* Interest in transfers
+* Interest in player market values
+* Interest in goals and match results
+* Interest in football gossip or Reddit-style discussions
+The app should probably show the user content related to their nation early, because this creates immediate emotional connection. However, not every country has a strong national league, so the app needs to handle this intelligently.
+For example:
+* If the user is from England, Spain, Italy, Germany, France, Brazil, Argentina, Poland, Turkey, or the Netherlands, the national league may be relevant.
+* If the user is from a country with a weaker or less-followed league, the app may instead focus on the national team, famous players from that country, or leagues where players from that country currently play.
+6. Quiz Content
+The quiz should include different types of football questions.
+Possible categories:
+* Identify the player from a photo
+* Recent match results
+* Top scorers from the last week
+* Current league table positions
+* Transfer rumours
+* Confirmed transfers
+* Player market values
+* Club history
+* National team questions
+* Champions League questions
+* Current form questions
+* “Who scored?” questions
+* “Which club does this player play for?” questions
+* “Which player has the higher market value?” questions
+* Reddit-style football gossip questions
+The quiz should mix easy, medium, and advanced content.
+The quality of the quiz questions is one of the most important parts of the app.
+7. Data Sources
+The app may use multiple data sources to generate or support quiz content.
+Possible data categories:
+* Players
+* Clubs
+* Leagues
+* National teams
+* Fixtures
+* Results
+* Goals
+* League tables
+* Transfers
+* Player market values
+* Recent news
+* Reddit discussions
+* Football gossip
+* Social media trends
+Transfer data and recent football events are especially important because they make the app feel current.
+8. Core Product Principle
+The app should feel alive and up to date.
+A football quiz app is much more engaging if it asks about things that happened recently, not only timeless trivia.
+The strongest hook may be:
+“Do you really know what happened in football this week?”
+This could make the app feel more like a daily habit than a one-time trivia game.
+9. Engineering Background
+The founder has 25 years of software development experience and strong experience building large-scale backend systems.
+Technical background:
+* Senior software engineer experience in major global software companies
+* Deep backend engineering experience
+* Experience scaling systems to around 1 billion requests per day
+* Strongest languages: Java and Kotlin
+* Strong JVM engineering background
+* Limited production experience with mobile apps
+This affects the technical strategy. The project should lean into strong engineering practices, high-quality architecture, and robust tooling from the beginning.
+10. Platform Strategy
+The app should be multiplatform.
+The same product should work across:
+* iOS
+* Android
+* Potentially other platforms in the future
+A cross-platform approach is preferred, but quality must not be sacrificed.
+The chosen technology should support:
+* Excellent user experience
+* Strong testability
+* High code quality
+* Good performance
+* Good battery efficiency
+* Maintainable architecture
+* AI-assisted development with strong guardrails
+11. Code Quality Requirements
+Code quality is the number one engineering priority.
+Some product trade-offs are acceptable, but poor code quality is not acceptable.
+The codebase should be:
+* Well tested
+* Well structured
+* Maintainable
+* Easy to reason about
+* Safe for AI-assisted development
+* Protected by strong local quality checks
+* Built in a framework or architecture that reduces the chance of mistakes
+The development process should assume that a large amount of code may be written with AI assistance. Therefore, the codebase should have strong guardrails that make it difficult for AI-generated code to introduce bugs, poor patterns, or architectural drift.
+12. Local Development Pipeline
+The local development pipeline should enforce very high quality before code is pushed.
+GitHub should mainly be used for deployment and repository hosting, not as the first line of quality control.
+Quality checks should happen locally before pushing.
+The local pipeline should include checks such as:
+* Unit tests
+* Integration tests where appropriate
+* Code coverage checks
+* Static analysis
+* Linting
+* Formatting
+* Dependency vulnerability scanning
+* Type checking
+* Architecture rules
+* Dead code detection
+* Complexity checks
+* Security checks
+* Build verification
+The goal is that low-quality code should not even leave the developer’s machine.
+13. Performance and Battery Requirements
+The app must use device hardware responsibly.
+It should never feel heavy, wasteful, or annoying to the user.
+The app must not:
+* Drain battery unnecessarily
+* Overuse network requests
+* Overuse background processing
+* Feel slow or bloated
+* Make the phone hot
+* Become a liability that users want to uninstall
+Performance and battery efficiency are product features, not just technical concerns.
+14. UX Priorities
+Great UX is one of the most important parts of the app.
+The app must feel:
+* Fast
+* Fun
+* Intelligent
+* Lightweight
+* Personal
+* Current
+* Easy to start
+* Hard to abandon
+The first few seconds are critical.
+The user should quickly feel:
+“This app knows football, and it understands what kind of fan I am.”
+15. Product Priorities
+The most important priorities are:
+1. Great first-time user experience
+2. Fast engagement without login friction
+3. Intelligent personalization
+4. High-quality quiz questions
+5. Current football data
+6. Excellent UX
+7. Very high code quality
+8. Strong local development pipeline
+9. Efficient battery and hardware usage
+10. Maintainable cross-platform architecture
+16. Initial Product Hypothesis
+The app should not start as a generic quiz app.
+It should start as a smart, personalized, current football quiz app.
+The main hook could be:
+“Test how well you followed football this week.”
+This gives the app a reason to be opened repeatedly.
+A user may come back daily or weekly to check whether they still know what is happening in football.
