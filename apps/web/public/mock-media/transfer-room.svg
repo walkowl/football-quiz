@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Mock football transfer photo</title>
+  <desc id="desc">A stylized player silhouette and transfer board in a dark football media room.</desc>
+  <defs>
+    <linearGradient id="room" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0c1119"/>
+      <stop offset=".52" stop-color="#1b202b"/>
+      <stop offset="1" stop-color="#090c10"/>
+    </linearGradient>
+    <radialGradient id="screen" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#4771ff" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#4771ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#room)"/>
+  <rect x="86" y="78" width="790" height="330" rx="22" fill="#111924" stroke="#314051" stroke-width="6"/>
+  <rect x="118" y="110" width="318" height="92" rx="14" fill="#182637"/>
+  <rect x="118" y="226" width="318" height="130" rx="14" fill="#182637"/>
+  <rect x="488" y="112" width="340" height="244" rx="18" fill="#111820"/>
+  <circle cx="654" cy="216" r="78" fill="url(#screen)"/>
+  <path d="M618 184c22-32 74-30 92 4-35-5-62-1-92-4z" fill="#19110e"/>
+  <circle cx="662" cy="205" r="38" fill="#9a6243"/>
+  <path d="M591 292c42-38 102-39 145 0l30 116H558z" fill="#d76530"/>
+  <path d="M136 134h244M136 164h174M136 252h244M136 288h198M136 324h226" stroke="#e6f0ff" stroke-opacity=".56" stroke-width="16" stroke-linecap="round"/>
+  <path d="M154 434h652" stroke="#f0a24f" stroke-opacity=".72" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="186" cy="434" r="16" fill="#1fd072"/>
+  <circle cx="322" cy="434" r="16" fill="#f0a24f"/>
+  <circle cx="458" cy="434" r="16" fill="#f45c48"/>
+  <circle cx="594" cy="434" r="16" fill="#1fd072"/>
+  <circle cx="730" cy="434" r="16" fill="#f0a24f"/>
+</svg>

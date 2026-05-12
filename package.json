@@ -1,0 +1,22 @@
+{
+  "name": "football-quiz",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "build": "npm run build -w apps/web",
+    "dev": "npm run dev -w apps/web",
+    "dev:web:lan": "npm run dev:lan -w apps/web",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "npm run lint -w apps/web",
+    "quality": "tools/quality/check.sh",
+    "test": "npm run test -w apps/web",
+    "typecheck": "npm run typecheck -w apps/web"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}

@@ -48,9 +48,18 @@ step "checking repository boundaries"
 require_file "README.md"
 require_file "docs/PROJECT_BOUNDARIES.md"
 require_file "docs/PLATFORM_STRATEGY.md"
+require_file "docs/VISUAL_DIRECTION.md"
+require_file "docs/references/preferred-mobile-quiz-direction.jpeg"
+require_file "docs/LOCAL_ONLY_AND_DATA_PLAN.md"
 require_file "docs/ENGINEERING_GUARDRAILS.md"
 require_file "docs/LOCAL_QUALITY_PATH.md"
 require_file "docs/decisions/0001-project-boundaries.md"
+require_file "docs/decisions/0002-platform-strategy.md"
+require_file "docs/decisions/0003-local-first-prototype-and-mocked-data.md"
+
+if [[ -f "package.json" ]]; then
+  require_file "package-lock.json"
+fi
 
 step "checking local-only files stay out of git"
 ensure_not_tracked '(^|/)\.DS_Store$' ".DS_Store"

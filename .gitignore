@@ -11,6 +11,8 @@ build/
 dist/
 out/
 .gradle/
+.next/
+*.tsbuildinfo
 
 # Dependencies
 node_modules/
@@ -22,6 +24,7 @@ node_modules/
 
 # Local-only automation
 .local-quality/
+mockups/
 
 # Logs and reports
 *.log

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Mock club stadium photo</title>
+  <desc id="desc">A stylized football stadium under lights with two players challenging for the ball.</desc>
+  <defs>
+    <linearGradient id="night" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#071019"/>
+      <stop offset=".5" stop-color="#152338"/>
+      <stop offset="1" stop-color="#0d1c16"/>
+    </linearGradient>
+    <radialGradient id="beam" cx="50%" cy="0%" r="85%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>
+      <stop offset=".22" stop-color="#ffc77a" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pitch" x1="0" x2="1">
+      <stop offset="0" stop-color="#1d7b48"/>
+      <stop offset=".5" stop-color="#31a65f"/>
+      <stop offset="1" stop-color="#17663e"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+  </defs>
+  <rect width="960" height="540" fill="url(#night)"/>
+  <circle cx="130" cy="10" r="220" fill="url(#beam)"/>
+  <circle cx="835" cy="5" r="220" fill="url(#beam)"/>
+  <g filter="url(#soft)" opacity=".45">
+    <path d="M0 180c210-76 700-80 960 0v96H0z" fill="#334a59"/>
+    <path d="M0 218c290-42 670-40 960 2" stroke="#f2b35d" stroke-width="14" opacity=".42"/>
+  </g>
+  <path d="M0 304h960v236H0z" fill="url(#pitch)"/>
+  <ellipse cx="480" cy="422" rx="286" ry="86" fill="none" stroke="#ecf8e7" stroke-opacity=".28" stroke-width="5"/>
+  <path d="M480 304v236M0 422h960" stroke="#ecf8e7" stroke-opacity=".22" stroke-width="5"/>
+  <ellipse cx="385" cy="476" rx="88" ry="20" fill="#06120d" opacity=".42"/>
+  <ellipse cx="586" cy="476" rx="94" ry="20" fill="#06120d" opacity=".42"/>
+  <g transform="translate(270 150)">
+    <circle cx="72" cy="44" r="28" fill="#a76443"/>
+    <path d="M34 90h81l28 124H12z" fill="#e9e9df"/>
+    <path d="M54 92h43v116H54z" fill="#1e2938"/>
+    <path d="M24 104-42 170l24 30 68-56zM125 100l82 48-16 34-82-34z" fill="#a76443"/>
+    <path d="M38 214 10 334h42l42-116zM106 214l64 112h42l-58-122z" fill="#19212c"/>
+  </g>
+  <g transform="translate(535 144)">
+    <circle cx="70" cy="48" r="29" fill="#7a4b35"/>
+    <path d="M26 92h91l24 126H4z" fill="#d45b2c"/>
+    <path d="M50 96h48l-10 114H61z" fill="#f2e4c6"/>
+    <path d="M24 108-38 154l18 34 72-38zM125 106l74 62-24 28-66-46z" fill="#7a4b35"/>
+    <path d="M34 216 3 334h44l41-112zM102 218l58 116h43l-50-126z" fill="#101820"/>
+  </g>
+  <circle cx="493" cy="388" r="28" fill="#f8f3df"/>
+  <path d="m476 371 34 34M512 371l-37 36M464 389h58" stroke="#1a1d22" stroke-width="4" opacity=".55"/>
+</svg>

@@ -16,6 +16,15 @@ tools/quality/check.sh
 
 This command is intentionally technology-aware but framework-neutral at the start of the project. As the app stack is chosen, the gate should grow to include the real compiler, formatter, linter, architecture checks, tests, security checks, and build verification for that stack.
 
+For the current web prototype, the gate runs:
+
+- Prettier format check.
+- ESLint for the web app.
+- TypeScript type checking.
+- Vitest unit and component tests.
+- Next.js production build.
+- NPM high-severity audit.
+
 ## GitHub Boundary
 
 Do not add a broad GitHub quality pipeline by default.
