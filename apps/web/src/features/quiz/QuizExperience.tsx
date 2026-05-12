@@ -225,7 +225,7 @@ export function QuizExperience() {
   }
 
   function selectAnswer(optionId: string) {
-    if (!currentQuestion || selectedAnswer) {
+    if (!currentQuestion) {
       return;
     }
 
@@ -560,8 +560,6 @@ function QuestionCard({
   onSelectAnswer,
   onNext,
 }: QuestionCardProps) {
-  const answered = Boolean(selectedAnswer);
-
   return (
     <section className="quiz-card" aria-label="Current question">
       <QuestionMedia
@@ -594,13 +592,11 @@ function QuestionCard({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              disabled={answered}
               key={option.id}
               onClick={() => onSelectAnswer(option.id)}
-              onPointerUp={(event) => {
-                if (event.pointerType === "touch") {
-                  onSelectAnswer(option.id);
-                }
+              onTouchEnd={(event) => {
+                event.preventDefault();
+                onSelectAnswer(option.id);
               }}
               type="button"
             >

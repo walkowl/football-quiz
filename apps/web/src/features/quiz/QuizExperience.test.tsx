@@ -38,15 +38,23 @@ describe("QuizExperience", () => {
   it("accepts touch taps on answer buttons", () => {
     render(<QuizExperience />);
 
-    fireEvent.pointerUp(
+    fireEvent.touchEnd(
       screen.getByRole("button", { name: "Cristiano Ronaldo" }),
-      {
-        pointerType: "touch",
-      },
     );
 
     expect(screen.getByTestId("feedback")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: /Next question/ })).toBeEnabled();
+  });
+
+  it("lets a user change an answer before moving next", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Lionel Messi" }));
+    expect(screen.getByTestId("feedback")).toHaveTextContent("Not this time");
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+
+    expect(screen.getByTestId("feedback")).toHaveTextContent("Correct");
   });
 
   it("reaches the profile screen after three answers", () => {
