@@ -942,6 +942,105 @@ button {
   line-height: 1.08;
 }
 
+.daily-matchday-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(29, 184, 102, 0.32);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(29, 184, 102, 0.14), transparent 62%),
+    rgba(255, 255, 255, 0.055);
+  padding: 10px;
+}
+
+.daily-matchday-copy {
+  min-width: 0;
+}
+
+.daily-matchday-copy span,
+.daily-matchday-copy h3,
+.daily-matchday-copy p {
+  display: block;
+  margin: 0;
+}
+
+.daily-matchday-copy span {
+  color: #8cffbd;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.daily-matchday-copy h3 {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 950;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-matchday-copy p {
+  overflow: hidden;
+  margin-top: 4px;
+  color: rgba(246, 244, 238, 0.58);
+  font-size: 0.68rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-matchday-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.daily-matchday-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(29, 184, 102, 0.58);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: #9dffc8;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 7px 9px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+  white-space: nowrap;
+}
+
+.daily-matchday-button.primary {
+  border-color: rgba(217, 121, 55, 0.7);
+  background: var(--amber);
+  color: #17110c;
+}
+
+.daily-matchday-button:hover,
+.daily-matchday-button:focus-visible {
+  border-color: rgba(29, 184, 102, 0.94);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.daily-matchday-button.primary:hover,
+.daily-matchday-button.primary:focus-visible {
+  border-color: rgba(255, 190, 122, 0.95);
+  background: #efa15e;
+}
+
 .home-shortcuts {
   display: grid;
   gap: 8px;

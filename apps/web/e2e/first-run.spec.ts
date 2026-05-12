@@ -272,6 +272,43 @@ test("home hub routes between local mobile surfaces", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("home daily matchday routes into quiz and prediction", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  await page.getByRole("button", { name: "Home" }).tap();
+
+  const dailyMatchday = page.getByRole("region", { name: "Daily Matchday" });
+  await expect(dailyMatchday).toContainText("NAP vs INT");
+  await expect(dailyMatchday).toContainText("Serie A / Mock week 2");
+  await expect(page.locator(".phone-frame")).toHaveScreenshot(
+    "phone-home-hub.png",
+    {
+      animations: "disabled",
+      caret: "hide",
+      maxDiffPixelRatio: 0.03,
+    },
+  );
+
+  await dailyMatchday
+    .getByRole("button", { name: "Start Daily Matchday" })
+    .tap();
+  await expect(
+    page.getByRole("heading", {
+      name: "What is the key hook for Napoli vs Inter?",
+    }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Home" }).tap();
+  await page.getByRole("button", { name: "Predict score" }).tap();
+  await expect(
+    page.getByRole("heading", { name: "Score League" }),
+  ).toBeVisible();
+});
+
 test("home screen keeps the approved mobile visual direction", async ({
   page,
 }) => {

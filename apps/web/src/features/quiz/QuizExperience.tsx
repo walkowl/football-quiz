@@ -22,7 +22,6 @@ import {
   User,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   firstRunQuizPack,
@@ -146,6 +145,7 @@ export function QuizExperience() {
   const { activePackId, answers, questionIndex, selectedTopics } = quizUi;
 
   const activePack = localPackById.get(activePackId) ?? firstRunQuizPack;
+  const dailyMatchdayPack = localPackById.get("daily-matchday");
   const quizQuestions = activePack.questions;
   const currentQuestion = quizQuestions[questionIndex];
   const selectedAnswer = currentQuestion
@@ -399,6 +399,7 @@ export function QuizExperience() {
             <LocalHomeScreen
               activePack={activePack}
               answeredCount={answeredCount}
+              dailyPack={dailyMatchdayPack}
               fixture={scheduledPredictionFixture}
               isComplete={isComplete}
               localPredictionEntry={localPredictionEntry}
@@ -672,13 +673,8 @@ export function QuestionMedia({
 
   return (
     <figure className="media-frame">
-      <Image
-        alt={media.alt}
-        fill
-        loading="eager"
-        sizes="(max-width: 520px) 100vw, 360px"
-        src={media.src}
-      />
+      {/* eslint-disable-next-line @next/next/no-img-element -- local mock media keeps first-load JS smaller without provider image work */}
+      <img alt={media.alt} decoding="async" loading="eager" src={media.src} />
       <QuestionDataBadges freshness={freshness} source={source} />
       <figcaption>{media.credit}</figcaption>
     </figure>
@@ -827,6 +823,7 @@ function ResultCard({
 interface LocalHomeScreenProps {
   activePack: QuizPack;
   answeredCount: number;
+  dailyPack?: QuizPack;
   fixture?: PredictionFixture;
   isComplete: boolean;
   localPredictionEntry?: PredictionLeagueEntry;
@@ -841,6 +838,7 @@ interface LocalHomeScreenProps {
 function LocalHomeScreen({
   activePack,
   answeredCount,
+  dailyPack,
   fixture,
   isComplete,
   localPredictionEntry,
@@ -898,6 +896,16 @@ function LocalHomeScreen({
         </div>
       </div>
 
+      {dailyPack ? (
+        <DailyMatchdayPanel
+          fixture={fixture}
+          pack={dailyPack}
+          savedPrediction={savedPrediction}
+          onPredict={() => onNavigate("leaderboard")}
+          onStart={() => onStartPack(dailyPack.id)}
+        />
+      ) : null}
+
       <section className="home-shortcuts" aria-label="Home shortcuts">
         <HomeShortcut
           copy={quizShortcutCopy}
@@ -932,6 +940,61 @@ function LocalHomeScreen({
         </div>
         <Shield aria-hidden="true" size={26} />
       </section>
+    </section>
+  );
+}
+
+function DailyMatchdayPanel({
+  fixture,
+  pack,
+  savedPrediction,
+  onPredict,
+  onStart,
+}: {
+  fixture?: PredictionFixture;
+  pack: QuizPack;
+  savedPrediction?: ScorePrediction;
+  onPredict: () => void;
+  onStart: () => void;
+}) {
+  const fixtureLabel = fixture
+    ? `${fixture.homeTeam.shortName} vs ${fixture.awayTeam.shortName}`
+    : "Fixture pending";
+  const fixtureMeta = fixture
+    ? `${fixture.competition} / ${fixture.matchday}`
+    : "Mock fixture";
+  const pickLabel =
+    savedPrediction && fixture
+      ? `${savedPrediction.score.home}-${savedPrediction.score.away}`
+      : "Pick";
+
+  return (
+    <section className="daily-matchday-card" aria-label="Daily Matchday">
+      <div className="daily-matchday-copy">
+        <span>Daily Matchday</span>
+        <h3>{fixtureLabel}</h3>
+        <p>{fixtureMeta}</p>
+      </div>
+      <div className="daily-matchday-actions">
+        <button
+          aria-label={`Start ${pack.title}`}
+          className="daily-matchday-button primary"
+          onClick={onStart}
+          type="button"
+        >
+          <Play aria-hidden="true" size={15} />
+          Quiz
+        </button>
+        <button
+          aria-label="Predict score"
+          className="daily-matchday-button"
+          onClick={onPredict}
+          type="button"
+        >
+          <BarChart3 aria-hidden="true" size={15} />
+          {pickLabel}
+        </button>
+      </div>
     </section>
   );
 }

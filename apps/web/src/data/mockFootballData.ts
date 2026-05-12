@@ -1,4 +1,28 @@
-import type { QuizPack, QuizQuestion, TopicOption } from "../domain/quiz";
+import type {
+  QuizMedia,
+  QuizPack,
+  QuizQuestion,
+  TopicOption,
+} from "../domain/quiz";
+
+const localMockSource: QuizQuestion["source"] = {
+  kind: "mock",
+  label: "Local mock data",
+};
+const mockWeekFreshness: QuizQuestion["freshness"] = {
+  label: "Mock week",
+  validUntil: "Replace before beta",
+};
+const mockMatchdayFreshness: QuizQuestion["freshness"] = {
+  label: "Mock matchday",
+  validUntil: "Replace before beta",
+};
+const clubNightMedia: QuizMedia = {
+  kind: "image",
+  src: "/mock-media/club-night.svg",
+  alt: "Footballers under stadium lights.",
+  credit: "Mock image",
+};
 
 export const mockQuestions: QuizQuestion[] = [
   {
@@ -7,14 +31,8 @@ export const mockQuestions: QuizQuestion[] = [
     difficulty: "easy",
     prompt: "Who is this football legend?",
     context: "Mock image-led player ID.",
-    freshness: {
-      label: "Mock week",
-      validUntil: "Replace before beta",
-    },
-    source: {
-      kind: "mock",
-      label: "Local mock data",
-    },
+    freshness: mockWeekFreshness,
+    source: localMockSource,
     media: {
       kind: "image",
       src: "/mock-media/legend-photo.jpeg",
@@ -41,16 +59,8 @@ export const mockQuestions: QuizQuestion[] = [
       label: "Historical anchor",
       validUntil: "Stable",
     },
-    source: {
-      kind: "mock",
-      label: "Local mock data",
-    },
-    media: {
-      kind: "image",
-      src: "/mock-media/club-night.svg",
-      alt: "Footballers under stadium lights.",
-      credit: "Mock image",
-    },
+    source: localMockSource,
+    media: clubNightMedia,
     options: [
       { id: "dortmund", label: "Borussia Dortmund", hint: "BVB" },
       { id: "leverkusen", label: "Bayer Leverkusen", hint: "Werkself" },
@@ -71,10 +81,7 @@ export const mockQuestions: QuizQuestion[] = [
       label: "Mock valuation",
       validUntil: "Provider required",
     },
-    source: {
-      kind: "mock",
-      label: "Local mock data",
-    },
+    source: localMockSource,
     options: [
       {
         id: "young-winger",
@@ -121,20 +128,9 @@ export const weeklyPulseQuizPack: QuizPack = {
       difficulty: "easy",
       prompt: "Who won the featured derby in this week's local pulse?",
       context: "Mock completed match result.",
-      freshness: {
-        label: "Mock week",
-        validUntil: "Replace before beta",
-      },
-      source: {
-        kind: "mock",
-        label: "Local mock data",
-      },
-      media: {
-        kind: "image",
-        src: "/mock-media/club-night.svg",
-        alt: "Two footballers challenging for a ball under stadium lights.",
-        credit: "Mock image",
-      },
+      freshness: mockWeekFreshness,
+      source: localMockSource,
+      media: clubNightMedia,
       options: [
         { id: "arsenal", label: "Arsenal", hint: "2-1" },
         { id: "tottenham", label: "Tottenham", hint: "1-2" },
@@ -151,14 +147,8 @@ export const weeklyPulseQuizPack: QuizPack = {
       difficulty: "medium",
       prompt: "Which profile triggers a form watch?",
       context: "Mock normalized player-form signal.",
-      freshness: {
-        label: "Mock week",
-        validUntil: "Replace before beta",
-      },
-      source: {
-        kind: "mock",
-        label: "Local mock data",
-      },
+      freshness: mockWeekFreshness,
+      source: localMockSource,
       options: [
         {
           id: "wide-forward",
@@ -191,14 +181,8 @@ export const weeklyPulseQuizPack: QuizPack = {
       difficulty: "advanced",
       prompt: "What hook fits a jump from 7th to 4th?",
       context: "Mock standings movement.",
-      freshness: {
-        label: "Mock week",
-        validUntil: "Replace before beta",
-      },
-      source: {
-        kind: "mock",
-        label: "Local mock data",
-      },
+      freshness: mockWeekFreshness,
+      source: localMockSource,
       media: {
         kind: "image",
         src: "/mock-media/transfer-room.svg",
@@ -234,9 +218,127 @@ export const weeklyPulseQuizPack: QuizPack = {
   ],
 };
 
+export const dailyMatchdayQuizPack: QuizPack = {
+  id: "daily-matchday",
+  title: "Daily Matchday",
+  subtitle: "Napoli vs Inter mock prep before score picks.",
+  questions: [
+    {
+      id: "mock-daily-nap-int-hook",
+      category: "Match preview",
+      difficulty: "easy",
+      prompt: "What is the key hook for Napoli vs Inter?",
+      context: "Mock Serie A preview.",
+      freshness: mockMatchdayFreshness,
+      source: localMockSource,
+      media: clubNightMedia,
+      options: [
+        {
+          id: "title-pressure",
+          label: "Title-race pressure",
+          hint: "Fixture stakes",
+        },
+        {
+          id: "shirt-launch",
+          label: "New shirt launch",
+          hint: "Commercial story",
+        },
+        {
+          id: "stadium-food",
+          label: "Stadium food ranking",
+          hint: "Not match form",
+        },
+        {
+          id: "mascot-return",
+          label: "Mascot return",
+          hint: "Side story",
+        },
+      ],
+      correctOptionId: "title-pressure",
+      explanation:
+        "The mock preview is built around a high-stakes Serie A clash.",
+      tags: ["serie-a", "fixtures", "matchday"],
+    },
+    {
+      id: "mock-daily-nap-int-form-signal",
+      category: "Team form",
+      difficulty: "medium",
+      prompt: "Which signal should guide the score pick first?",
+      context: "Mock team-form signal.",
+      freshness: mockMatchdayFreshness,
+      source: localMockSource,
+      options: [
+        {
+          id: "chance-creation",
+          label: "Recent chance creation",
+          hint: "Repeatable signal",
+        },
+        {
+          id: "old-trophy-count",
+          label: "Old trophy count",
+          hint: "Historic",
+        },
+        {
+          id: "kit-colour",
+          label: "Kit colour",
+          hint: "No match signal",
+        },
+        {
+          id: "stadium-size",
+          label: "Stadium size",
+          hint: "Weak predictor",
+        },
+      ],
+      correctOptionId: "chance-creation",
+      explanation:
+        "Recent chance creation is closer to the upcoming match than historic trivia.",
+      tags: ["serie-a", "form", "score-predictions", "text-only"],
+    },
+    {
+      id: "mock-daily-nap-int-pick-logic",
+      category: "Prediction logic",
+      difficulty: "advanced",
+      prompt: "What makes a score prediction league useful?",
+      context: "Mock prediction scoring model.",
+      freshness: {
+        label: "Mock rules",
+        validUntil: "Compliance required before rewards",
+      },
+      source: localMockSource,
+      options: [
+        {
+          id: "outcome-margin",
+          label: "Outcome plus margin",
+          hint: "Skill signal",
+        },
+        {
+          id: "random-points",
+          label: "Random point boosts",
+          hint: "Meaningless",
+        },
+        {
+          id: "team-colours",
+          label: "Team colours",
+          hint: "Weak signal",
+        },
+        {
+          id: "old-headline",
+          label: "Old headline",
+          hint: "Stale context",
+        },
+      ],
+      correctOptionId: "outcome-margin",
+      explanation:
+        "Exact score, outcome, and margin can rank skill without fake points or reward promises.",
+      tags: ["score-predictions", "leaderboards", "advanced", "text-only"],
+    },
+  ],
+};
+
 export const localMockQuizPacks: QuizPack[] = [
   firstRunQuizPack,
   weeklyPulseQuizPack,
+  dailyMatchdayQuizPack,
 ];
 
 export const topicOptions: TopicOption[] = [

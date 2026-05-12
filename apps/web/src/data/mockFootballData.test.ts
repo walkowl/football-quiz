@@ -65,8 +65,10 @@ describe("mock football data", () => {
     expect(allQuestions.some((question) => !question.media)).toBe(true);
   });
 
-  it("keeps the weekly pulse pack aligned with playable recommendations", () => {
-    expect(localMockQuizPacks.map((pack) => pack.id)).toContain("weekly-pulse");
+  it("keeps local continuation packs available for Home routes", () => {
+    expect(localMockQuizPacks.map((pack) => pack.id)).toEqual(
+      expect.arrayContaining(["weekly-pulse", "daily-matchday"]),
+    );
   });
 
   it("keeps referenced mock media present, accessible, and lightweight", () => {

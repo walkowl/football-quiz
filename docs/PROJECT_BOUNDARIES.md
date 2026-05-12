@@ -33,6 +33,16 @@ The first session should:
 - Once real user data exists, the benchmark should be backed by real cohort data and should say which cohort it compares against.
 - The result screen must keep the most relevant information above the fold on mobile: player comparison, knowledge level, accuracy or correct count, strongest signal, and the next useful action.
 - Users should not need to scroll before understanding how they did or what to do next.
+- Home must surface the most important matchday actions at the top: continue or start the right quiz, make a score prediction, and see the player-relative benchmark.
+
+## Near-Term Local Plan
+
+1. Keep the app local-only while the first product loop is still changing quickly.
+2. Build a mocked Daily Matchday loop that connects one upcoming fixture, a short quiz pack, and the score-prediction league.
+3. Keep phone click-through on a production LAN preview so mobile testing reflects the hydrated app, not a dev-server edge case.
+4. Add tests for every major first-screen interaction, especially answer taps/clicks and Home-to-quiz/Home-to-prediction routing.
+5. Expand the mock data contract before paying for a provider: fixture, team, player, quiz source, freshness, media, and photoless fallback fields.
+6. Revisit VPS and real football data only when external testers, scheduled ingestion, accounts, or real freshness requirements make local-only work too slow.
 
 ## In Scope
 

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   readLocalScorePrediction,
@@ -314,6 +314,43 @@ describe("QuizExperience", () => {
       screen.getByRole("heading", {
         name: "Who is this football legend?",
       }),
+    ).toBeInTheDocument();
+  });
+
+  it("surfaces Daily Matchday actions above Home shortcuts", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+
+    const dailyMatchday = screen.getByRole("region", {
+      name: "Daily Matchday",
+    });
+
+    expect(dailyMatchday).toHaveTextContent("NAP vs INT");
+    expect(dailyMatchday).toHaveTextContent("Serie A / Mock week 2");
+
+    fireEvent.click(
+      within(dailyMatchday).getByRole("button", {
+        name: "Start Daily Matchday",
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: "What is the key hook for Napoli vs Inter?",
+      }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+    fireEvent.click(
+      within(screen.getByRole("region", { name: "Daily Matchday" })).getByRole(
+        "button",
+        { name: "Predict score" },
+      ),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Score League" }),
     ).toBeInTheDocument();
   });
 

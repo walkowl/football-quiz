@@ -21,10 +21,12 @@ Open `http://localhost:3000` and switch the browser dev tools to a mobile viewpo
 Phone browser on the same Wi-Fi:
 
 ```sh
-npm run dev:web:lan
+npm run preview:web:lan
 ```
 
-Open `http://<your-mac-ip>:3000` from the phone browser. This does not require an app download, TestFlight, Play Store, or any VPS.
+Open `http://<your-mac-ip>:3001` from the phone browser. This runs a production build over the local network, which is the preferred mobile click-through path because it avoids dev-server hydration issues seen on LAN IPs.
+
+This does not require an app download, TestFlight, Play Store, or any VPS.
 
 ## Mock Data For Now
 
@@ -59,6 +61,7 @@ The local mock layer now includes:
 - Image-led questions for the preferred visual loop.
 - Text-only questions for provider, licensing, or missing-photo cases.
 - A local next-pack handoff from the first-run result screen and Home hub into Weekly Pulse.
+- A Daily Matchday plan that ties an upcoming mocked fixture, a short quiz, and score prediction into the first local habit loop.
 - A player-relative result benchmark, such as `Better than X% of players`, instead of meaningless score totals.
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.
@@ -67,6 +70,14 @@ The local mock layer now includes:
 - A device-only local controls sheet for checking mock status and resetting quiz/prediction state during mobile testing.
 
 This is enough to keep building locally while the quiz contract stabilizes. It is not yet enough to pay for a football data provider.
+
+## Next Local Milestones
+
+1. Ship the mocked Daily Matchday loop on Home, with the key fixture, quiz action, and score-prediction action above the fold.
+2. Add a provider-shaped Daily Matchday quiz pack with both image-led and photoless questions.
+3. Protect first-screen mobile interactions with tests that click and tap real answer buttons.
+4. Keep the score-prediction league local and non-monetary until reward rules pass legal, compliance, tax, age, identity, and jurisdiction review.
+5. Only start provider evaluation after the local data contract is stable enough that real data can replace mocks without rewriting the UI.
 
 ## Do Not Buy A VPS Yet
 
