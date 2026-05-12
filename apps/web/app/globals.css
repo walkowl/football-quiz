@@ -214,6 +214,108 @@ button {
   transform: translateY(-1px);
 }
 
+.settings-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  align-items: end;
+  background: rgba(5, 7, 10, 0.64);
+  padding: 16px;
+}
+
+.settings-sheet {
+  position: relative;
+  display: grid;
+  gap: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), transparent), #141a21;
+  box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.38);
+  padding: 16px;
+}
+
+.settings-sheet h2,
+.settings-sheet p {
+  margin: 0;
+}
+
+.settings-sheet h2 {
+  color: var(--ink);
+  font-size: 1.42rem;
+  font-weight: 950;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.settings-sheet p {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+  padding: 0 11px;
+}
+
+.settings-sheet span,
+.settings-sheet strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-sheet span {
+  color: #ffc58d;
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.settings-sheet strong {
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 930;
+}
+
+.settings-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+.settings-reset-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(225, 91, 79, 0.48);
+  border-radius: 999px;
+  background: rgba(225, 91, 79, 0.12);
+  color: #ffd4cf;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 0 14px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.settings-reset-button:hover,
+.settings-reset-button:focus-visible {
+  border-color: rgba(225, 91, 79, 0.78);
+  background: rgba(225, 91, 79, 0.2);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .match-strip {
   display: grid;
   gap: 7px;

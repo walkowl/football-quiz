@@ -333,6 +333,49 @@ describe("QuizExperience", () => {
     ).toBeUndefined();
   });
 
+  it("opens local settings and resets device-only progress", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: "Leaderboard" }));
+    fireEvent.change(screen.getByLabelText("Napoli score"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText("Inter score"), {
+      target: { value: "1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
+
+    expect(readLocalQuizProgress(storage)?.answers).toEqual({
+      "mock-week-1-legend": "ronaldo",
+    });
+    expect(
+      readLocalScorePrediction(storage, "mock-serie-a-nap-int-2026-05-16")
+        ?.score,
+    ).toEqual({
+      home: 2,
+      away: 1,
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+
+    expect(screen.getByRole("dialog")).toHaveTextContent("Controls");
+    expect(screen.getByText("Mock")).toBeInTheDocument();
+    expect(screen.getByText("NAP 2-1 INT")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset data" }));
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(readLocalQuizProgress(storage)).toBeUndefined();
+    expect(
+      readLocalScorePrediction(storage, "mock-serie-a-nap-int-2026-05-16"),
+    ).toBeUndefined();
+    expect(screen.getByLabelText("0% complete")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Who is this football legend?" }),
+    ).toBeInTheDocument();
+  });
+
   it("restores a locally saved score prediction on load", async () => {
     saveLocalScorePrediction(storage, {
       id: "local-mock-serie-a-nap-int-2026-05-16",

@@ -229,15 +229,15 @@ export function getFeedback(question: QuizQuestion, selectedOptionId: string) {
 export function recommendationCopy(outcome: QuizOutcome) {
   switch (outcome.level) {
     case "Advanced Fan":
-      return "Try form, values, and transfer logic next.";
+      return "Try form and transfer logic.";
     case "Daily Follower":
-      return "Mix results, tables, transfers, and one hard value question.";
+      return "Mix results, tables, and values.";
     case "Intermediate Fan":
-      return "Favourite league plus one news question.";
+      return "League focus plus news.";
     case "Casual Fan":
-      return "Famous players, big clubs, national-team moments.";
+      return "Stars, clubs, and countries.";
     case "Newbie":
-      return "Superstars, major clubs, simple results.";
+      return "Superstars and simple results.";
   }
 }
 
@@ -278,21 +278,20 @@ export function recommendPacks(profile: FanProfile): RecommendedPack[] {
     {
       id: "weekly-pulse",
       title: "Weekly Pulse",
-      description: "Recent results, scorers, table movement, and form traps.",
-      freshness: "Refresh weekly",
+      description: "Results, scorers, tables, form.",
+      freshness: "Weekly",
     },
     {
       id: "transfer-radar",
       title: "Transfer Radar",
-      description: "Confirmed moves, rumours, and market-value comparisons.",
-      freshness: "Needs provider",
+      description: "Moves, rumours, market value.",
+      freshness: "Provider",
     },
     {
       id: "nation-hook",
       title: "Nation Hook",
-      description:
-        "National-team players, heroes, and country-first questions.",
-      freshness: "Good for onboarding",
+      description: "Players, heroes, countries.",
+      freshness: "Onboarding",
     },
   ];
 

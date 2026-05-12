@@ -68,6 +68,7 @@ import {
   saveLocalScorePrediction,
 } from "./localPredictionStorage";
 import {
+  clearLocalQuizProgress,
   getBrowserQuizProgressStorage,
   readLocalQuizProgress,
   saveLocalQuizProgress,
@@ -115,6 +116,7 @@ interface PredictionUiState {
 
 export function QuizExperience() {
   const [activeView, setActiveView] = useState<AppView>("play");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [quizUiOverride, setQuizUiOverride] = useState<QuizUiState | undefined>(
     undefined,
   );
@@ -183,6 +185,10 @@ export function QuizExperience() {
   const localPredictionEntry = predictionLeaderboard.find(
     (entry) => entry.userId === localPredictionMember.userId,
   );
+  const settingsPickLabel =
+    predictionUi.savedPrediction && scheduledPredictionFixture
+      ? `${scheduledPredictionFixture.homeTeam.shortName} ${predictionUi.savedPrediction.score.home}-${predictionUi.savedPrediction.score.away} ${scheduledPredictionFixture.awayTeam.shortName}`
+      : "No pick";
   const localProfileSummary = buildLocalProfileSummary({
     activePackTitle: activePack.title,
     answeredCount,
@@ -254,6 +260,22 @@ export function QuizExperience() {
     startPack(activePack.id);
   }
 
+  function resetLocalData() {
+    clearLocalQuizProgress(getBrowserQuizProgressStorage());
+
+    if (scheduledPredictionFixture) {
+      clearLocalScorePrediction(
+        getBrowserPredictionStorage(),
+        scheduledPredictionFixture.id,
+      );
+    }
+
+    setActiveView("play");
+    setSettingsOpen(false);
+    setQuizUiOverride(createDefaultQuizUiState());
+    setPredictionUiOverride(createDefaultPredictionUiState());
+  }
+
   function toggleTopic(topicId: string) {
     const nextTopics = selectedTopics.includes(topicId)
       ? selectedTopics.filter((id) => id !== topicId)
@@ -296,6 +318,7 @@ export function QuizExperience() {
             <button
               aria-label="Settings"
               className="chrome-button"
+              onClick={() => setSettingsOpen(true)}
               type="button"
             >
               <Settings aria-hidden="true" size={17} />
@@ -481,6 +504,42 @@ export function QuizExperience() {
         </div>
 
         <BottomNav activeView={activeView} onNavigate={setActiveView} />
+        {settingsOpen ? (
+          <section
+            aria-label="Controls"
+            aria-modal="true"
+            className="settings-backdrop"
+            role="dialog"
+          >
+            <div className="settings-sheet">
+              <button
+                aria-label="Close settings"
+                className="chrome-button settings-close"
+                onClick={() => setSettingsOpen(false)}
+                type="button"
+              >
+                <X aria-hidden="true" size={17} />
+              </button>
+              <h2>Controls</h2>
+              <p>
+                <span>Data</span>
+                <strong>Mock</strong>
+              </p>
+              <p>
+                <span>Pick</span>
+                <strong>{settingsPickLabel}</strong>
+              </p>
+              <button
+                className="settings-reset-button"
+                onClick={resetLocalData}
+                type="button"
+              >
+                <Trash2 aria-hidden="true" size={16} />
+                Reset data
+              </button>
+            </div>
+          </section>
+        ) : null}
       </section>
     </main>
   );
@@ -867,10 +926,8 @@ function LocalHomeScreen({
       <section className="home-data-card" aria-label="Local data status">
         <div>
           <span>Mock data</span>
-          <strong>Provider boundary ready</strong>
-          <p>
-            Fixtures, players, picks, images, and freshness labels stay local.
-          </p>
+          <strong>Provider</strong>
+          <p>Fixtures and picks stay local.</p>
         </div>
         <Shield aria-hidden="true" size={26} />
       </section>

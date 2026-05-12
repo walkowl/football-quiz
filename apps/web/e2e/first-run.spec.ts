@@ -44,9 +44,7 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   await page.getByRole("button", { name: "Home" }).tap();
   await expect(page.getByRole("heading", { name: "Next quiz" })).toBeVisible();
   await expect(
-    page.getByText(
-      "Weekly Pulse / Recent results, scorers, table movement, and form traps.",
-    ),
+    page.getByText("Weekly Pulse / Results, scorers, tables, form."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Open Next quiz" }).tap();
   await expect(
@@ -182,6 +180,33 @@ test("profile tab summarizes local quiz and prediction state", async ({
     "NAP 2-1 INT",
   );
   await expect(page.getByLabel("Prediction rank Pending")).toBeVisible();
+});
+
+test("local settings can reset device-only state", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  await page.getByRole("button", { name: "Cristiano Ronaldo" }).tap();
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+  await page.getByLabel("Napoli score").fill("2");
+  await page.getByLabel("Inter score").fill("1");
+  await page.getByRole("button", { name: "Save prediction" }).tap();
+
+  await page.getByRole("button", { name: "Settings" }).tap();
+
+  await expect(page.getByRole("dialog", { name: "Controls" })).toBeVisible();
+  await expect(page.getByText("NAP 2-1 INT")).toBeVisible();
+  await page.getByRole("button", { name: "Reset data" }).tap();
+
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByLabel("0% complete")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Who is this football legend?" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+  await expect(page.getByText("Restored 2-1 from this device")).toHaveCount(0);
 });
 
 test("home hub routes between local mobile surfaces", async ({ page }) => {

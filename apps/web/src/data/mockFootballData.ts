@@ -6,8 +6,7 @@ export const mockQuestions: QuizQuestion[] = [
     category: "Player ID",
     difficulty: "easy",
     prompt: "Who is this football legend?",
-    context:
-      "Mock weekly feed: this question represents an image-led player-identification question.",
+    context: "Mock image-led player ID.",
     freshness: {
       label: "Mock week",
       validUntil: "Replace before beta",
@@ -19,7 +18,7 @@ export const mockQuestions: QuizQuestion[] = [
     media: {
       kind: "image",
       src: "/mock-media/legend-photo.jpeg",
-      alt: "A football legend celebrating in a Portugal kit.",
+      alt: "Football legend in a Portugal kit.",
       credit: "Mock photo",
     },
     options: [
@@ -29,17 +28,15 @@ export const mockQuestions: QuizQuestion[] = [
       { id: "mbappe", label: "Kylian Mbappe", hint: "France" },
     ],
     correctOptionId: "ronaldo",
-    explanation:
-      "The mock photo points to Ronaldo and keeps the opener fast, visual, and familiar.",
+    explanation: "The mock photo points to Ronaldo.",
     tags: ["players", "photo", "national-team"],
   },
   {
     id: "mock-week-1-leverkusen",
     category: "Club context",
     difficulty: "medium",
-    prompt: "Which club became the story of a modern unbeaten Bundesliga run?",
-    context:
-      "Mock history/current-context blend: useful for testing league-interest personalization.",
+    prompt: "Which club owned a modern unbeaten Bundesliga run?",
+    context: "Mock Bundesliga context.",
     freshness: {
       label: "Historical anchor",
       validUntil: "Stable",
@@ -51,7 +48,7 @@ export const mockQuestions: QuizQuestion[] = [
     media: {
       kind: "image",
       src: "/mock-media/club-night.svg",
-      alt: "Two footballers challenging for a ball under stadium lights.",
+      alt: "Footballers under stadium lights.",
       credit: "Mock image",
     },
     options: [
@@ -61,17 +58,15 @@ export const mockQuestions: QuizQuestion[] = [
       { id: "leipzig", label: "RB Leipzig", hint: "Saxony" },
     ],
     correctOptionId: "leverkusen",
-    explanation:
-      "Leverkusen is the intended medium answer and helps the app detect Bundesliga awareness.",
+    explanation: "Leverkusen is the intended Bundesliga signal.",
     tags: ["bundesliga", "clubs", "form"],
   },
   {
     id: "mock-week-1-market-value",
     category: "Market value",
     difficulty: "advanced",
-    prompt: "Which profile would usually carry the higher market-value signal?",
-    context:
-      "Mock market question: this tests whether the user follows age, role, and transfer value patterns.",
+    prompt: "Which profile carries higher market value?",
+    context: "Mock market-value signal.",
     freshness: {
       label: "Mock valuation",
       validUntil: "Provider required",
@@ -103,8 +98,7 @@ export const mockQuestions: QuizQuestion[] = [
       },
     ],
     correctOptionId: "young-winger",
-    explanation:
-      "The mock model rewards high-upside attacking players because age, scarcity, and resale value matter.",
+    explanation: "Age, scarcity, and resale value favour the winger.",
     tags: ["market-values", "transfers", "advanced", "text-only"],
   },
 ];
@@ -126,8 +120,7 @@ export const weeklyPulseQuizPack: QuizPack = {
       category: "Recent result",
       difficulty: "easy",
       prompt: "Who won the featured derby in this week's local pulse?",
-      context:
-        "Mock match result: this stands in for a recent completed match once a provider exists.",
+      context: "Mock completed match result.",
       freshness: {
         label: "Mock week",
         validUntil: "Replace before beta",
@@ -149,17 +142,15 @@ export const weeklyPulseQuizPack: QuizPack = {
         { id: "postponed", label: "Match postponed", hint: "No result" },
       ],
       correctOptionId: "arsenal",
-      explanation:
-        "The local pulse marks Arsenal as the mock winner so the app can exercise recent-result questions before live data.",
+      explanation: "Arsenal is the mock winner.",
       tags: ["recent-results", "premier-league", "clubs"],
     },
     {
       id: "mock-pulse-player-form",
       category: "Player form",
       difficulty: "medium",
-      prompt: "Which player profile should trigger a form-watch question?",
-      context:
-        "Mock player form: this represents a normalized player signal rather than raw provider data.",
+      prompt: "Which profile triggers a form watch?",
+      context: "Mock normalized player-form signal.",
       freshness: {
         label: "Mock week",
         validUntil: "Replace before beta",
@@ -172,7 +163,7 @@ export const weeklyPulseQuizPack: QuizPack = {
         {
           id: "wide-forward",
           label: "Wide forward",
-          hint: "3 goal involvements in 2 matches",
+          hint: "3 G/A in 2",
         },
         {
           id: "unused-sub",
@@ -191,17 +182,15 @@ export const weeklyPulseQuizPack: QuizPack = {
         },
       ],
       correctOptionId: "wide-forward",
-      explanation:
-        "A short run of goal involvements is the strongest mock signal for a form-based question.",
+      explanation: "Recent goal involvements are the strongest form signal.",
       tags: ["players", "form", "text-only"],
     },
     {
       id: "mock-pulse-table-movement",
       category: "Table movement",
       difficulty: "advanced",
-      prompt: "What is the strongest quiz hook from a club jumping 7th to 4th?",
-      context:
-        "Mock table movement: this prepares the app for standings-driven quiz generation.",
+      prompt: "What hook fits a jump from 7th to 4th?",
+      context: "Mock standings movement.",
       freshness: {
         label: "Mock week",
         validUntil: "Replace before beta",
@@ -213,7 +202,7 @@ export const weeklyPulseQuizPack: QuizPack = {
       media: {
         kind: "image",
         src: "/mock-media/transfer-room.svg",
-        alt: "A football analysis room with a player silhouette and data board.",
+        alt: "Football analysis room.",
         credit: "Mock image",
       },
       options: [
@@ -239,8 +228,7 @@ export const weeklyPulseQuizPack: QuizPack = {
         },
       ],
       correctOptionId: "champions-league-race",
-      explanation:
-        "A move into fourth place is a standings signal, so the quiz should frame it around the Champions League race.",
+      explanation: "Fourth place points to the Champions League race.",
       tags: ["tables", "form", "advanced"],
     },
   ],
@@ -255,21 +243,21 @@ export const topicOptions: TopicOption[] = [
   {
     id: "premier-league",
     label: "Premier League",
-    hint: "Results, scorers, table swings",
+    hint: "Results, scorers",
   },
   {
     id: "transfers",
     label: "Transfers",
-    hint: "Confirmed moves and rumours",
+    hint: "Moves and rumours",
   },
   {
     id: "market-values",
     label: "Market values",
-    hint: "Who is worth more and why",
+    hint: "Who is worth more",
   },
   {
     id: "national-team",
     label: "National team",
-    hint: "Country-first questions",
+    hint: "Country questions",
   },
 ];
