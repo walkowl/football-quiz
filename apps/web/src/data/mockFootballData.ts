@@ -18,7 +18,7 @@ export const mockQuestions: QuizQuestion[] = [
     media: {
       kind: "image",
       src: "/mock-media/legend-photo.jpeg",
-      alt: "Football legend in a Portugal kit.",
+      alt: "Portugal footballer.",
       credit: "Mock photo",
     },
     options: [

@@ -102,6 +102,7 @@ body::after {
 button {
   -webkit-tap-highlight-color: transparent;
   font: inherit;
+  touch-action: manipulation;
 }
 
 .app-shell {
@@ -497,6 +498,8 @@ button {
 }
 
 .answer-list {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 9px;
 }
@@ -518,6 +521,8 @@ button {
   cursor: pointer;
   padding: 7px 9px;
   text-align: left;
+  -webkit-user-select: none;
+  user-select: none;
   transition:
     transform 160ms ease,
     border-color 160ms ease,

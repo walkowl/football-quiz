@@ -10,7 +10,7 @@ test("first-run quiz can be completed on a mobile viewport", async ({
     page.getByRole("heading", { name: "Footy Guess" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("img", { name: /football legend/i }),
+    page.getByRole("img", { name: /portugal footballer/i }),
   ).toBeVisible();
   const dataStatus = page.getByRole("group", {
     name: "Question data status",

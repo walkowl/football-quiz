@@ -597,6 +597,11 @@ function QuestionCard({
               disabled={answered}
               key={option.id}
               onClick={() => onSelectAnswer(option.id)}
+              onPointerUp={(event) => {
+                if (event.pointerType === "touch") {
+                  onSelectAnswer(option.id);
+                }
+              }}
               type="button"
             >
               <span className="answer-letter" aria-hidden="true">
@@ -927,7 +932,7 @@ function LocalHomeScreen({
         <div>
           <span>Mock data</span>
           <strong>Provider</strong>
-          <p>Fixtures and picks stay local.</p>
+          <p>Picks stay local.</p>
         </div>
         <Shield aria-hidden="true" size={26} />
       </section>

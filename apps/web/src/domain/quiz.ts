@@ -233,11 +233,11 @@ export function recommendationCopy(outcome: QuizOutcome) {
     case "Daily Follower":
       return "Mix results, tables, and values.";
     case "Intermediate Fan":
-      return "League focus plus news.";
+      return "League plus news.";
     case "Casual Fan":
       return "Stars, clubs, and countries.";
     case "Newbie":
-      return "Superstars and simple results.";
+      return "Stars and results.";
   }
 }
 
@@ -284,13 +284,13 @@ export function recommendPacks(profile: FanProfile): RecommendedPack[] {
     {
       id: "transfer-radar",
       title: "Transfer Radar",
-      description: "Moves, rumours, market value.",
+      description: "Moves, values.",
       freshness: "Provider",
     },
     {
       id: "nation-hook",
       title: "Nation Hook",
-      description: "Players, heroes, countries.",
+      description: "Heroes, countries.",
       freshness: "Onboarding",
     },
   ];
