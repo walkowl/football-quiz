@@ -80,12 +80,6 @@ export const mockQuestions: QuizQuestion[] = [
       kind: "mock",
       label: "Local mock data",
     },
-    media: {
-      kind: "image",
-      src: "/mock-media/transfer-room.svg",
-      alt: "A football transfer room with a player silhouette and valuation board.",
-      credit: "Mock image",
-    },
     options: [
       {
         id: "young-winger",
@@ -111,7 +105,7 @@ export const mockQuestions: QuizQuestion[] = [
     correctOptionId: "young-winger",
     explanation:
       "The mock model rewards high-upside attacking players because age, scarcity, and resale value matter.",
-    tags: ["market-values", "transfers", "advanced"],
+    tags: ["market-values", "transfers", "advanced", "text-only"],
   },
 ];
 
@@ -121,6 +115,141 @@ export const firstRunQuizPack: QuizPack = {
   subtitle: "Three fast questions to estimate your football level.",
   questions: mockQuestions,
 };
+
+export const weeklyPulseQuizPack: QuizPack = {
+  id: "mock-weekly-pulse",
+  title: "Weekly Pulse",
+  subtitle: "Local mock questions shaped like recent match and player data.",
+  questions: [
+    {
+      id: "mock-pulse-featured-result",
+      category: "Recent result",
+      difficulty: "easy",
+      prompt: "Who won the featured derby in this week's local pulse?",
+      context:
+        "Mock match result: this stands in for a recent completed match once a provider exists.",
+      freshness: {
+        label: "Mock week",
+        validUntil: "Replace before beta",
+      },
+      source: {
+        kind: "mock",
+        label: "Local mock data",
+      },
+      media: {
+        kind: "image",
+        src: "/mock-media/club-night.svg",
+        alt: "Two footballers challenging for a ball under stadium lights.",
+        credit: "Mock image",
+      },
+      options: [
+        { id: "arsenal", label: "Arsenal", hint: "2-1" },
+        { id: "tottenham", label: "Tottenham", hint: "1-2" },
+        { id: "draw", label: "Draw", hint: "1-1" },
+        { id: "postponed", label: "Match postponed", hint: "No result" },
+      ],
+      correctOptionId: "arsenal",
+      explanation:
+        "The local pulse marks Arsenal as the mock winner so the app can exercise recent-result questions before live data.",
+      tags: ["recent-results", "premier-league", "clubs"],
+    },
+    {
+      id: "mock-pulse-player-form",
+      category: "Player form",
+      difficulty: "medium",
+      prompt: "Which player profile should trigger a form-watch question?",
+      context:
+        "Mock player form: this represents a normalized player signal rather than raw provider data.",
+      freshness: {
+        label: "Mock week",
+        validUntil: "Replace before beta",
+      },
+      source: {
+        kind: "mock",
+        label: "Local mock data",
+      },
+      options: [
+        {
+          id: "wide-forward",
+          label: "Wide forward",
+          hint: "3 goal involvements in 2 matches",
+        },
+        {
+          id: "unused-sub",
+          label: "Unused substitute",
+          hint: "0 minutes",
+        },
+        {
+          id: "suspended-captain",
+          label: "Suspended captain",
+          hint: "Unavailable",
+        },
+        {
+          id: "loan-recall",
+          label: "Loan recall",
+          hint: "No recent starts",
+        },
+      ],
+      correctOptionId: "wide-forward",
+      explanation:
+        "A short run of goal involvements is the strongest mock signal for a form-based question.",
+      tags: ["players", "form", "text-only"],
+    },
+    {
+      id: "mock-pulse-table-movement",
+      category: "Table movement",
+      difficulty: "advanced",
+      prompt: "What is the strongest quiz hook from a club jumping 7th to 4th?",
+      context:
+        "Mock table movement: this prepares the app for standings-driven quiz generation.",
+      freshness: {
+        label: "Mock week",
+        validUntil: "Replace before beta",
+      },
+      source: {
+        kind: "mock",
+        label: "Local mock data",
+      },
+      media: {
+        kind: "image",
+        src: "/mock-media/transfer-room.svg",
+        alt: "A football analysis room with a player silhouette and data board.",
+        credit: "Mock image",
+      },
+      options: [
+        {
+          id: "champions-league-race",
+          label: "Champions League race",
+          hint: "Position swing",
+        },
+        {
+          id: "stadium-capacity",
+          label: "Stadium capacity",
+          hint: "Not table-linked",
+        },
+        {
+          id: "shirt-sponsor",
+          label: "Shirt sponsor",
+          hint: "Commercial trivia",
+        },
+        {
+          id: "mascot-history",
+          label: "Mascot history",
+          hint: "Evergreen topic",
+        },
+      ],
+      correctOptionId: "champions-league-race",
+      explanation:
+        "A move into fourth place is a standings signal, so the quiz should frame it around the Champions League race.",
+      tags: ["tables", "form", "advanced"],
+    },
+  ],
+};
+
+export const localMockQuizPacks: QuizPack[] = [
+  firstRunQuizPack,
+  weeklyPulseQuizPack,
+];
 
 export const topicOptions: TopicOption[] = [
   {

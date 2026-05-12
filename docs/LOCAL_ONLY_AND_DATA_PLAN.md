@@ -45,6 +45,17 @@ The mock data must still look like real product data. It should have source labe
 
 Normal mock quiz questions should include media because the intended quiz format is image-led. The model must still allow `media` to be absent, and the UI must render a deliberate photoless fallback.
 
+## Current Mock Coverage
+
+The local mock layer now includes:
+
+- A first-run legend challenge with player ID, club context, and market-value questions.
+- A weekly pulse pack shaped like recent-result, player-form, and table-movement content.
+- Image-led questions for the preferred visual loop.
+- Text-only questions for provider, licensing, or missing-photo cases.
+
+This is enough to keep building locally while the quiz contract stabilizes. It is not yet enough to pay for a football data provider.
+
 ## Do Not Buy A VPS Yet
 
 A VPS is not useful while the product is still proving the first quiz loop locally.

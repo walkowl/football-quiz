@@ -304,10 +304,19 @@ button {
 .media-fallback {
   display: grid;
   place-items: center;
-  gap: 8px;
+  gap: 6px;
   color: rgba(246, 244, 238, 0.7);
   font-size: 0.82rem;
   font-weight: 820;
+  text-align: center;
+}
+
+.media-fallback small {
+  color: var(--amber);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .question-kicker {

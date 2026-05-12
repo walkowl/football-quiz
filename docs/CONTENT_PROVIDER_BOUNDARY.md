@@ -6,6 +6,8 @@ Football Quiz uses local mock content only.
 
 The app should behave as if real football content is coming later, but the current prototype must not depend on paid data, scheduled ingestion, a VPS, or provider credentials.
 
+The current local mocks cover the first provider-shaped content slices: image-led player identification, recent result, player form, table movement, transfer-style, and market-value-style questions. They also include deliberate text-only questions so missing or unlicensed images remain a supported product state.
+
 ## Boundary Shape
 
 The app consumes normalized quiz content, not raw provider responses.

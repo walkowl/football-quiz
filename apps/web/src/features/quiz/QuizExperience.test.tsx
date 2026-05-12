@@ -19,6 +19,11 @@ describe("QuizExperience", () => {
     fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
     fireEvent.click(screen.getByRole("button", { name: "Bayer Leverkusen" }));
     fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+
+    expect(
+      screen.getByRole("img", { name: "No question photo available" }),
+    ).toHaveTextContent("Text-only question");
+
     fireEvent.click(
       screen.getByRole("button", { name: "20-year-old elite winger" }),
     );
@@ -30,10 +35,11 @@ describe("QuizExperience", () => {
   });
 
   it("renders a deliberate fallback when question media is missing", () => {
-    render(<QuestionMedia />);
+    render(<QuestionMedia category="Market value" />);
 
     expect(
       screen.getByRole("img", { name: "No question photo available" }),
-    ).toHaveTextContent("Photo unavailable");
+    ).toHaveTextContent("Text-only question");
+    expect(screen.getByText("Market value")).toBeInTheDocument();
   });
 });

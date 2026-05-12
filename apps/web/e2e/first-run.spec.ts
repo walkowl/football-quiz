@@ -19,6 +19,9 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   await page.getByRole("button", { name: /Next question/ }).tap();
   await page.getByRole("button", { name: "Bayer Leverkusen" }).tap();
   await page.getByRole("button", { name: /Next question/ }).tap();
+  await expect(
+    page.getByRole("img", { name: "No question photo available" }),
+  ).toContainText("Text-only question");
   await page.getByRole("button", { name: "20-year-old elite winger" }).tap();
   await page.getByRole("button", { name: /Reveal profile/ }).tap();
 

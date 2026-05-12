@@ -149,6 +149,7 @@ export function QuizExperience() {
         <div className="screen-content">
           {!isComplete && currentQuestion ? (
             <QuestionCard
+              isFinalQuestion={questionIndex === quizQuestions.length - 1}
               onNext={goNext}
               onSelectAnswer={selectAnswer}
               question={currentQuestion}
@@ -173,12 +174,14 @@ export function QuizExperience() {
 
 interface QuestionCardProps {
   question: QuizQuestion;
+  isFinalQuestion: boolean;
   selectedAnswer?: string;
   onSelectAnswer: (optionId: string) => void;
   onNext: () => void;
 }
 
 function QuestionCard({
+  isFinalQuestion,
   question,
   selectedAnswer,
   onSelectAnswer,
@@ -188,7 +191,7 @@ function QuestionCard({
 
   return (
     <section className="quiz-card" aria-label="Current question">
-      <QuestionMedia media={question.media} />
+      <QuestionMedia category={question.category} media={question.media} />
 
       <p className="question-kicker">
         {question.difficulty} / {question.category}
@@ -255,16 +258,20 @@ function QuestionCard({
         onClick={onNext}
         type="button"
       >
-        {question.id === quizQuestions.at(-1)?.id
-          ? "Reveal profile"
-          : "Next question"}
+        {isFinalQuestion ? "Reveal profile" : "Next question"}
         <ChevronRight aria-hidden="true" size={18} />
       </button>
     </section>
   );
 }
 
-export function QuestionMedia({ media }: { media?: QuizMedia }) {
+export function QuestionMedia({
+  category = "Question",
+  media,
+}: {
+  category?: string;
+  media?: QuizMedia;
+}) {
   if (!media) {
     return (
       <div
@@ -273,7 +280,8 @@ export function QuestionMedia({ media }: { media?: QuizMedia }) {
         aria-label="No question photo available"
       >
         <Shield aria-hidden="true" size={34} />
-        <span>Photo unavailable</span>
+        <span>Text-only question</span>
+        <small>{category}</small>
       </div>
     );
   }
