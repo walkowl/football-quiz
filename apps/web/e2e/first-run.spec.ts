@@ -57,6 +57,33 @@ test("home screen has no serious accessibility violations", async ({
   expect(results.violations).toEqual([]);
 });
 
+test("prediction league saves a local score on mobile", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+
+  await expect(
+    page.getByRole("heading", { name: "Score League" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Prediction league status")).toContainText(
+    "Rewards locked",
+  );
+
+  await page.getByLabel("Napoli score").fill("2");
+  await page.getByLabel("Inter score").fill("1");
+  await page.getByRole("button", { name: "Save prediction" }).tap();
+
+  await expect(page.getByText("Saved 2-1")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "You" })).toBeVisible();
+  await expect(page.getByText(/bet|odds|wager|payout|cash/i)).toHaveCount(0);
+
+  await page.locator(".screen-content").evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(page.getByText("ARS / TOT")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Leaderboard" })).toBeVisible();
+});
+
 test("home screen keeps the approved mobile visual direction", async ({
   page,
 }) => {

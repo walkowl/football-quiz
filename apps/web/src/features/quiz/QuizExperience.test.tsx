@@ -91,6 +91,31 @@ describe("QuizExperience", () => {
     expect(marketValuesTopic).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("opens the local prediction league and saves a score prediction", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Leaderboard" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Score League" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("Rewards locked").length).toBeGreaterThan(0);
+    expect(
+      screen.queryByText(/bet|odds|wager|payout|cash/i),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Napoli score"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText("Inter score"), {
+      target: { value: "1" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
+
+    expect(screen.getByText("Saved 2-1")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
+  });
+
   it("renders a deliberate fallback when question media is missing", () => {
     render(
       <QuestionMedia

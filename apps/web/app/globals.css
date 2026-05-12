@@ -100,6 +100,7 @@ body::after {
 }
 
 button {
+  -webkit-tap-highlight-color: transparent;
   font: inherit;
 }
 
@@ -116,7 +117,7 @@ button {
   position: relative;
   display: flex;
   width: min(100%, 390px);
-  min-height: min(804px, calc(100svh - 48px));
+  height: min(804px, calc(100svh - 48px));
   overflow: hidden;
   flex-direction: column;
   border: 7px solid #05070a;
@@ -232,6 +233,27 @@ button {
   background: linear-gradient(90deg, #f08d45, #ffb05f);
   box-shadow: 0 0 15px rgba(240, 141, 69, 0.6);
   transition: width 220ms ease;
+}
+
+.league-status-track {
+  display: grid;
+  height: 6px;
+  grid-template-columns: 1.15fr 0.72fr 0.9fr;
+  gap: 5px;
+}
+
+.league-status-track span {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.league-status-track span:first-child {
+  background: linear-gradient(90deg, #f08d45, #ffb05f);
+  box-shadow: 0 0 15px rgba(240, 141, 69, 0.46);
+}
+
+.league-status-track span:nth-child(2) {
+  background: rgba(29, 184, 102, 0.7);
 }
 
 .match-meta {
@@ -710,6 +732,280 @@ button {
   cursor: default;
 }
 
+.prediction-screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 13px;
+  padding: 13px 0 10px;
+}
+
+.league-topline,
+.prediction-section-title,
+.prediction-panel-header {
+  display: flex;
+  align-items: center;
+}
+
+.league-topline {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.locked-pill {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(246, 244, 238, 0.74);
+  font-size: 0.68rem;
+  font-weight: 850;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+
+.league-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.league-heading p,
+.league-heading h2 {
+  margin: 0;
+}
+
+.league-heading p {
+  color: var(--amber);
+  font-size: 0.72rem;
+  font-weight: 880;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.league-heading h2 {
+  color: var(--ink);
+  font-size: 2rem;
+  font-weight: 950;
+  letter-spacing: 0;
+  line-height: 0.96;
+  text-transform: uppercase;
+}
+
+.league-heading svg {
+  color: #f5b36f;
+  flex: 0 0 auto;
+}
+
+.prediction-panel {
+  display: grid;
+  gap: 11px;
+  border: 1px solid rgba(217, 121, 55, 0.28);
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), transparent),
+    rgba(217, 121, 55, 0.08);
+  padding: 12px;
+}
+
+.prediction-panel-header,
+.prediction-section-title {
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--amber);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prediction-panel-header {
+  justify-content: flex-start;
+}
+
+.fixture-matchup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.fixture-matchup span {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.96rem;
+  font-weight: 920;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fixture-matchup span:last-child {
+  text-align: right;
+}
+
+.fixture-matchup strong {
+  color: rgba(246, 244, 238, 0.5);
+  font-size: 0.64rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.fixture-meta {
+  margin: 0;
+  color: rgba(246, 244, 238, 0.62);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.score-input-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.score-input {
+  display: grid;
+  grid-template-columns: 1fr 58px;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(5, 7, 10, 0.28);
+  color: var(--ink);
+  padding: 8px;
+}
+
+.score-input span {
+  overflow: hidden;
+  color: rgba(246, 244, 238, 0.7);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score-input input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(217, 121, 55, 0.46);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 930;
+  line-height: 1;
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.score-input input:focus {
+  border-color: #f4aa6c;
+  box-shadow: 0 0 0 2px rgba(217, 121, 55, 0.18);
+  outline: none;
+}
+
+.prediction-save {
+  width: 100%;
+  margin-top: 0;
+}
+
+.saved-prediction {
+  min-height: 18px;
+  margin: -2px 0 0;
+  color: rgba(246, 244, 238, 0.62);
+  font-size: 0.72rem;
+  font-weight: 760;
+  text-align: center;
+}
+
+.prediction-section-title small {
+  overflow: hidden;
+  color: rgba(246, 244, 238, 0.5);
+  font-size: 0.62rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.leaderboard-list,
+.fixture-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.leaderboard-row,
+.fixture-row {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+  padding: 10px;
+}
+
+.leaderboard-row {
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+}
+
+.fixture-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.rank {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(217, 121, 55, 0.18);
+  color: #ffc58d;
+  font-size: 0.78rem;
+  font-weight: 930;
+}
+
+.leaderboard-row h3,
+.leaderboard-row p,
+.fixture-row h3,
+.fixture-row p {
+  margin: 0;
+}
+
+.leaderboard-row h3,
+.fixture-row h3 {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderboard-row p,
+.fixture-row p {
+  margin-top: 2px;
+  color: rgba(246, 244, 238, 0.56);
+  font-size: 0.68rem;
+  font-weight: 720;
+}
+
+.leaderboard-row strong,
+.fixture-row strong {
+  color: #8cffbd;
+  font-size: 0.98rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
 .bottom-nav {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -743,7 +1039,7 @@ button {
 
   .phone-frame {
     width: 100%;
-    min-height: 100svh;
+    height: 100svh;
     border: 0;
     border-radius: 0;
   }

@@ -2,13 +2,17 @@
 
 import {
   BarChart3,
+  CalendarClock,
   Check,
   ChevronRight,
   Circle,
   Flame,
   Home,
+  Lock,
+  Medal,
   Play,
   RotateCcw,
+  Save,
   Settings,
   Shield,
   SlidersHorizontal,
@@ -23,6 +27,17 @@ import {
   localMockQuizPacks,
   topicOptions,
 } from "../../data/mockFootballData";
+import {
+  mockPredictionFixtures,
+  mockPredictionMembers,
+  mockScorePredictions,
+} from "../../data/mockPredictionData";
+import {
+  buildPredictionLeaderboard,
+  type PredictionFixture,
+  type ScoreLine,
+  type ScorePrediction,
+} from "../../domain/prediction";
 import {
   buildFanProfile,
   evaluateQuiz,
@@ -40,8 +55,20 @@ const localPackById = new Map(
   localMockQuizPacks.map((pack) => [pack.id, pack]),
 );
 const localPackIds = new Set(localPackById.keys());
+const localPredictionMember = {
+  userId: "local-user",
+  displayName: "You",
+};
+const localPredictionSubmittedAt = "2026-05-12T00:00:00.000Z";
+const defaultPredictionDraft: ScoreLine = {
+  home: 1,
+  away: 1,
+};
+
+type AppView = "play" | "leaderboard";
 
 export function QuizExperience() {
+  const [activeView, setActiveView] = useState<AppView>("play");
   const [activePackId, setActivePackId] = useState(firstRunQuizPack.id);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<AnswerMap>({});
@@ -49,6 +76,12 @@ export function QuizExperience() {
     "premier-league",
     "transfers",
   ]);
+  const [predictionDraft, setPredictionDraft] = useState<ScoreLine>(
+    defaultPredictionDraft,
+  );
+  const [savedPrediction, setSavedPrediction] = useState<
+    ScorePrediction | undefined
+  >();
 
   const activePack = localPackById.get(activePackId) ?? firstRunQuizPack;
   const quizQuestions = activePack.questions;
@@ -73,8 +106,12 @@ export function QuizExperience() {
     [answers, quizQuestions, selectedTopics],
   );
   const score = outcome.weightedScore * 420;
+  const scheduledFixture = mockPredictionFixtures.find(
+    (fixture) => fixture.status === "scheduled",
+  );
 
   function startPack(packId: string) {
+    setActiveView("play");
     setActivePackId(packId);
     setQuestionIndex(0);
     setAnswers({});
@@ -96,6 +133,7 @@ export function QuizExperience() {
   }
 
   function restart() {
+    setActiveView("play");
     startPack(activePack.id);
   }
 
@@ -140,30 +178,76 @@ export function QuizExperience() {
           </div>
         </div>
 
-        <section className="match-strip" aria-label="Quiz progress">
-          <div
-            aria-label={`${progress}% complete`}
-            aria-valuemax={100}
-            aria-valuemin={0}
-            aria-valuenow={progress}
-            className="progress-track"
-            role="progressbar"
-          >
-            <div className="progress-fill" style={{ width: `${progress}%` }} />
-          </div>
+        <section
+          className="match-strip"
+          aria-label={
+            activeView === "play" ? "Quiz progress" : "Prediction league status"
+          }
+        >
+          {activeView === "play" ? (
+            <div
+              aria-label={`${progress}% complete`}
+              aria-valuemax={100}
+              aria-valuemin={0}
+              aria-valuenow={progress}
+              className="progress-track"
+              role="progressbar"
+            >
+              <div
+                className="progress-fill"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          ) : (
+            <div className="league-status-track" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+          )}
           <div className="match-meta">
-            <span>
-              {isComplete
-                ? `${activePack.title} done`
-                : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
-            </span>
-            <strong>00:14</strong>
-            <span>Score: {score}</span>
+            {activeView === "play" ? (
+              <>
+                <span>
+                  {isComplete
+                    ? `${activePack.title} done`
+                    : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
+                </span>
+                <strong>00:14</strong>
+                <span>Score: {score}</span>
+              </>
+            ) : (
+              <>
+                <span>Prediction League</span>
+                <strong>Local</strong>
+                <span>Rewards locked</span>
+              </>
+            )}
           </div>
         </section>
 
         <div className="screen-content">
-          {!isComplete && currentQuestion ? (
+          {activeView === "leaderboard" ? (
+            <PredictionLeagueScreen
+              draft={predictionDraft}
+              fixture={scheduledFixture}
+              onDraftChange={setPredictionDraft}
+              onSave={() => {
+                if (!scheduledFixture) {
+                  return;
+                }
+
+                setSavedPrediction({
+                  id: `local-${scheduledFixture.id}`,
+                  fixtureId: scheduledFixture.id,
+                  userId: localPredictionMember.userId,
+                  score: predictionDraft,
+                  submittedAt: localPredictionSubmittedAt,
+                });
+              }}
+              savedPrediction={savedPrediction}
+            />
+          ) : !isComplete && currentQuestion ? (
             <QuestionCard
               isFinalQuestion={questionIndex === quizQuestions.length - 1}
               onNext={goNext}
@@ -185,7 +269,7 @@ export function QuizExperience() {
           )}
         </div>
 
-        <BottomNav />
+        <BottomNav activeView={activeView} onNavigate={setActiveView} />
       </section>
     </main>
   );
@@ -320,6 +404,7 @@ export function QuestionMedia({
       <Image
         alt={media.alt}
         fill
+        loading="eager"
         sizes="(max-width: 520px) 100vw, 360px"
         src={media.src}
       />
@@ -462,24 +547,234 @@ function ResultCard({
   );
 }
 
-function BottomNav() {
+interface PredictionLeagueScreenProps {
+  draft: ScoreLine;
+  fixture?: PredictionFixture;
+  savedPrediction?: ScorePrediction;
+  onDraftChange: (score: ScoreLine) => void;
+  onSave: () => void;
+}
+
+function PredictionLeagueScreen({
+  draft,
+  fixture,
+  savedPrediction,
+  onDraftChange,
+  onSave,
+}: PredictionLeagueScreenProps) {
+  const predictions = useMemo(
+    () =>
+      savedPrediction
+        ? [...mockScorePredictions, savedPrediction]
+        : mockScorePredictions,
+    [savedPrediction],
+  );
+  const members = useMemo(
+    () =>
+      savedPrediction
+        ? [...mockPredictionMembers, localPredictionMember]
+        : mockPredictionMembers,
+    [savedPrediction],
+  );
+  const leaderboard = useMemo(
+    () =>
+      buildPredictionLeaderboard({
+        fixtures: mockPredictionFixtures,
+        members,
+        predictions,
+      }),
+    [members, predictions],
+  );
+  const completedFixtures = mockPredictionFixtures.filter(
+    (candidate) => candidate.status === "completed",
+  );
+
+  function updateDraft(side: keyof ScoreLine, value: string) {
+    const parsed = Number.parseInt(value, 10);
+    const nextValue = Number.isFinite(parsed)
+      ? Math.min(Math.max(parsed, 0), 12)
+      : 0;
+
+    onDraftChange({
+      ...draft,
+      [side]: nextValue,
+    });
+  }
+
+  return (
+    <section className="prediction-screen" aria-label="Prediction league">
+      <div className="league-topline">
+        <span className="score-pill">Local league</span>
+        <span className="locked-pill">
+          <Lock aria-hidden="true" size={14} />
+          Rewards locked
+        </span>
+      </div>
+
+      <div className="league-heading">
+        <div>
+          <p>Mock score picks</p>
+          <h2>Score League</h2>
+        </div>
+        <Medal aria-hidden="true" size={28} />
+      </div>
+
+      <section className="prediction-panel" aria-label="Upcoming prediction">
+        <div className="prediction-panel-header">
+          <CalendarClock aria-hidden="true" size={18} />
+          <span>Next lock</span>
+        </div>
+        {fixture ? (
+          <>
+            <div className="fixture-matchup">
+              <span>{fixture.homeTeam.name}</span>
+              <strong>vs</strong>
+              <span>{fixture.awayTeam.name}</span>
+            </div>
+            <p className="fixture-meta">
+              {fixture.competition} / {fixture.matchday} /{" "}
+              {formatFixtureDate(fixture.lockAt)}
+            </p>
+            <div className="score-input-grid">
+              <label className="score-input">
+                <span>{fixture.homeTeam.shortName}</span>
+                <input
+                  aria-label={`${fixture.homeTeam.name} score`}
+                  inputMode="numeric"
+                  max={12}
+                  min={0}
+                  onChange={(event) =>
+                    updateDraft("home", event.currentTarget.value)
+                  }
+                  type="number"
+                  value={draft.home}
+                />
+              </label>
+              <label className="score-input">
+                <span>{fixture.awayTeam.shortName}</span>
+                <input
+                  aria-label={`${fixture.awayTeam.name} score`}
+                  inputMode="numeric"
+                  max={12}
+                  min={0}
+                  onChange={(event) =>
+                    updateDraft("away", event.currentTarget.value)
+                  }
+                  type="number"
+                  value={draft.away}
+                />
+              </label>
+            </div>
+            <button
+              className="primary-button prediction-save"
+              onClick={onSave}
+              type="button"
+            >
+              <Save aria-hidden="true" size={17} />
+              Save prediction
+            </button>
+            {savedPrediction ? (
+              <p className="saved-prediction">
+                Saved {savedPrediction.score.home}-{savedPrediction.score.away}
+              </p>
+            ) : (
+              <p className="saved-prediction">
+                Local only until the data provider boundary is ready.
+              </p>
+            )}
+          </>
+        ) : (
+          <p className="fixture-meta">No scheduled mock fixture available.</p>
+        )}
+      </section>
+
+      <section aria-label="Prediction leaderboard">
+        <div className="prediction-section-title">
+          <span>Leaderboard</span>
+          <small>Exact 5 / outcome 2 / margin 1</small>
+        </div>
+        <div className="leaderboard-list">
+          {leaderboard.map((entry, index) => (
+            <article className="leaderboard-row" key={entry.userId}>
+              <span className="rank">{index + 1}</span>
+              <div>
+                <h3>{entry.displayName}</h3>
+                <p>
+                  {entry.exactScores} exact / {entry.correctOutcomes} outcome
+                </p>
+              </div>
+              <strong>{entry.points}</strong>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section aria-label="Settled mock fixtures">
+        <div className="prediction-section-title">
+          <span>Settled fixtures</span>
+          <small>Mock results</small>
+        </div>
+        <div className="fixture-list">
+          {completedFixtures.map((settledFixture) => (
+            <article className="fixture-row" key={settledFixture.id}>
+              <div>
+                <h3>
+                  {settledFixture.homeTeam.shortName} /{" "}
+                  {settledFixture.awayTeam.shortName}
+                </h3>
+                <p>{settledFixture.competition}</p>
+              </div>
+              <strong>
+                {settledFixture.finalScore?.home}-
+                {settledFixture.finalScore?.away}
+              </strong>
+            </article>
+          ))}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function formatFixtureDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "short",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(new Date(value));
+}
+
+function BottomNav({
+  activeView,
+  onNavigate,
+}: {
+  activeView: AppView;
+  onNavigate: (view: AppView) => void;
+}) {
   const items = [
-    { label: "Home", icon: Home },
-    { label: "Play", icon: Play, active: true },
-    { label: "Leaderboard", icon: BarChart3 },
-    { label: "Profile", icon: User },
+    { label: "Home", icon: Home, view: "play" as const },
+    { label: "Play", icon: Play, view: "play" as const },
+    { label: "Leaderboard", icon: BarChart3, view: "leaderboard" as const },
+    { label: "Profile", icon: User, view: "play" as const },
   ];
 
   return (
     <nav className="bottom-nav" aria-label="Prototype navigation">
       {items.map((item) => {
         const Icon = item.icon;
+        const active =
+          (item.label === "Play" && activeView === "play") ||
+          (item.label === "Leaderboard" && activeView === "leaderboard");
 
         return (
           <button
-            aria-current={item.active ? "page" : undefined}
-            className={item.active ? "active" : ""}
+            aria-current={active ? "page" : undefined}
+            className={active ? "active" : ""}
             key={item.label}
+            onClick={() => onNavigate(item.view)}
             type="button"
           >
             <Icon aria-hidden="true" size={17} />
