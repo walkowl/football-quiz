@@ -13,6 +13,7 @@
     "format:check": "prettier --check .",
     "lint": "npm run lint -w apps/web",
     "quality:architecture": "node tools/quality/architecture-check.mjs",
+    "quality:bundle": "node tools/quality/bundle-budget.mjs",
     "quality": "tools/quality/check.sh",
     "test": "npm run test -w apps/web",
     "test:coverage": "npm run test:coverage -w apps/web",

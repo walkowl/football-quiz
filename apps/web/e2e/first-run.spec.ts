@@ -40,3 +40,18 @@ test("home screen has no serious accessibility violations", async ({
 
   expect(results.violations).toEqual([]);
 });
+
+test("home screen keeps the approved mobile visual direction", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await expect(page.locator(".phone-frame")).toHaveScreenshot(
+    "phone-home.png",
+    {
+      animations: "disabled",
+      caret: "hide",
+      maxDiffPixelRatio: 0.03,
+    },
+  );
+});

@@ -55,6 +55,8 @@ require_file "docs/references/preferred-mobile-quiz-direction.jpeg"
 require_file "docs/LOCAL_ONLY_AND_DATA_PLAN.md"
 require_file "docs/ENGINEERING_GUARDRAILS.md"
 require_file "docs/LOCAL_QUALITY_PATH.md"
+require_file "tools/quality/architecture-check.mjs"
+require_file "tools/quality/bundle-budget.mjs"
 require_file "docs/decisions/0001-project-boundaries.md"
 require_file "docs/decisions/0002-platform-strategy.md"
 require_file "docs/decisions/0003-local-first-prototype-and-mocked-data.md"
@@ -88,6 +90,7 @@ if [[ -f "package.json" ]]; then
     npm run quality:architecture --if-present
     npm run test:coverage --if-present
     npm run build --if-present
+    npm run quality:bundle --if-present
     npm run test:e2e --if-present
     npm audit --audit-level=high
   else

@@ -25,9 +25,13 @@ For the current web prototype, the gate runs:
 - Vitest unit and component tests.
 - Coverage threshold checks.
 - Playwright mobile browser E2E tests.
+- Playwright visual regression screenshot for the approved mobile phone frame.
 - Basic automated accessibility scan.
 - Next.js production build.
+- Bundle-size budgets from the production Next.js output.
 - NPM high-severity audit.
+
+The current bundle budgets are 575 KiB for first-load uncompressed route JavaScript and 240 KiB for the largest emitted JavaScript chunk. The current visual-regression baseline is the mobile phone-frame screenshot in `apps/web/e2e/first-run.spec.ts-snapshots/`.
 
 ## GitHub Boundary
 
