@@ -50,6 +50,11 @@ import {
   type QuizPack,
   type QuizQuestion,
 } from "../../domain/quiz";
+import {
+  getBrowserPredictionStorage,
+  readLocalScorePrediction,
+  saveLocalScorePrediction,
+} from "./localPredictionStorage";
 
 const localPackById = new Map(
   localMockQuizPacks.map((pack) => [pack.id, pack]),
@@ -64,8 +69,18 @@ const defaultPredictionDraft: ScoreLine = {
   home: 1,
   away: 1,
 };
+const scheduledPredictionFixture = mockPredictionFixtures.find(
+  (fixture) => fixture.status === "scheduled",
+);
 
 type AppView = "play" | "leaderboard";
+type PredictionSaveState = "draft" | "saved" | "restored" | "unavailable";
+
+interface PredictionUiState {
+  draft: ScoreLine;
+  saveState: PredictionSaveState;
+  savedPrediction?: ScorePrediction;
+}
 
 export function QuizExperience() {
   const [activeView, setActiveView] = useState<AppView>("play");
@@ -76,12 +91,9 @@ export function QuizExperience() {
     "premier-league",
     "transfers",
   ]);
-  const [predictionDraft, setPredictionDraft] = useState<ScoreLine>(
-    defaultPredictionDraft,
+  const [predictionUi, setPredictionUi] = useState<PredictionUiState>(
+    getInitialPredictionUiState,
   );
-  const [savedPrediction, setSavedPrediction] = useState<
-    ScorePrediction | undefined
-  >();
 
   const activePack = localPackById.get(activePackId) ?? firstRunQuizPack;
   const quizQuestions = activePack.questions;
@@ -106,9 +118,6 @@ export function QuizExperience() {
     [answers, quizQuestions, selectedTopics],
   );
   const score = outcome.weightedScore * 420;
-  const scheduledFixture = mockPredictionFixtures.find(
-    (fixture) => fixture.status === "scheduled",
-  );
 
   function startPack(packId: string) {
     setActiveView("play");
@@ -229,23 +238,42 @@ export function QuizExperience() {
         <div className="screen-content">
           {activeView === "leaderboard" ? (
             <PredictionLeagueScreen
-              draft={predictionDraft}
-              fixture={scheduledFixture}
-              onDraftChange={setPredictionDraft}
+              draft={predictionUi.draft}
+              fixture={scheduledPredictionFixture}
+              onDraftChange={(draft) =>
+                setPredictionUi((currentState) => ({
+                  ...currentState,
+                  draft,
+                }))
+              }
               onSave={() => {
-                if (!scheduledFixture) {
+                if (!scheduledPredictionFixture) {
                   return;
                 }
 
-                setSavedPrediction({
-                  id: `local-${scheduledFixture.id}`,
-                  fixtureId: scheduledFixture.id,
+                const nextPrediction = {
+                  id: `local-${scheduledPredictionFixture.id}`,
+                  fixtureId: scheduledPredictionFixture.id,
                   userId: localPredictionMember.userId,
-                  score: predictionDraft,
+                  score: predictionUi.draft,
                   submittedAt: localPredictionSubmittedAt,
-                });
+                };
+
+                const saveState = saveLocalScorePrediction(
+                  getBrowserPredictionStorage(),
+                  nextPrediction,
+                )
+                  ? "saved"
+                  : "unavailable";
+
+                setPredictionUi((currentState) => ({
+                  ...currentState,
+                  savedPrediction: nextPrediction,
+                  saveState,
+                }));
               }}
-              savedPrediction={savedPrediction}
+              saveState={predictionUi.saveState}
+              savedPrediction={predictionUi.savedPrediction}
             />
           ) : !isComplete && currentQuestion ? (
             <QuestionCard
@@ -550,6 +578,7 @@ function ResultCard({
 interface PredictionLeagueScreenProps {
   draft: ScoreLine;
   fixture?: PredictionFixture;
+  saveState: PredictionSaveState;
   savedPrediction?: ScorePrediction;
   onDraftChange: (score: ScoreLine) => void;
   onSave: () => void;
@@ -558,6 +587,7 @@ interface PredictionLeagueScreenProps {
 function PredictionLeagueScreen({
   draft,
   fixture,
+  saveState,
   savedPrediction,
   onDraftChange,
   onSave,
@@ -675,7 +705,7 @@ function PredictionLeagueScreen({
             </button>
             {savedPrediction ? (
               <p className="saved-prediction">
-                Saved {savedPrediction.score.home}-{savedPrediction.score.away}
+                {getPredictionSaveMessage(savedPrediction, saveState)}
               </p>
             ) : (
               <p className="saved-prediction">
@@ -734,6 +764,38 @@ function PredictionLeagueScreen({
       </section>
     </section>
   );
+}
+
+function getPredictionSaveMessage(
+  prediction: ScorePrediction,
+  saveState: PredictionSaveState,
+) {
+  const score = `${prediction.score.home}-${prediction.score.away}`;
+
+  if (saveState === "restored") {
+    return `Restored ${score} from this device`;
+  }
+
+  if (saveState === "unavailable") {
+    return `Saved ${score} for this session`;
+  }
+
+  return `Saved ${score} locally`;
+}
+
+function getInitialPredictionUiState(): PredictionUiState {
+  const storedPrediction = scheduledPredictionFixture
+    ? readLocalScorePrediction(
+        getBrowserPredictionStorage(),
+        scheduledPredictionFixture.id,
+      )
+    : undefined;
+
+  return {
+    draft: storedPrediction?.score ?? defaultPredictionDraft,
+    savedPrediction: storedPrediction,
+    saveState: storedPrediction ? "restored" : "draft",
+  };
 }
 
 function formatFixtureDate(value: string) {

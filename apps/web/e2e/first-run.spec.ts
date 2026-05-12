@@ -59,6 +59,8 @@ test("home screen has no serious accessibility violations", async ({
 
 test("prediction league saves a local score on mobile", async ({ page }) => {
   await page.goto("/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
 
   await page.getByRole("button", { name: "Leaderboard" }).tap();
 
@@ -73,9 +75,16 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await page.getByLabel("Inter score").fill("1");
   await page.getByRole("button", { name: "Save prediction" }).tap();
 
-  await expect(page.getByText("Saved 2-1")).toBeVisible();
+  await expect(page.getByText("Saved 2-1 locally")).toBeVisible();
   await expect(page.getByRole("heading", { name: "You" })).toBeVisible();
   await expect(page.getByText(/bet|odds|wager|payout|cash/i)).toHaveCount(0);
+
+  await page.reload();
+  await page.getByRole("button", { name: "Leaderboard" }).tap();
+
+  await expect(page.getByText("Restored 2-1 from this device")).toBeVisible();
+  await expect(page.getByLabel("Napoli score")).toHaveValue("2");
+  await expect(page.getByLabel("Inter score")).toHaveValue("1");
 
   await page.locator(".screen-content").evaluate((element) => {
     element.scrollTop = element.scrollHeight;

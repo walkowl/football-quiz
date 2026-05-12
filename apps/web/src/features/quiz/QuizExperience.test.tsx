@@ -1,8 +1,19 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { saveLocalScorePrediction } from "./localPredictionStorage";
 import { QuestionMedia, QuizExperience } from "./QuizExperience";
 
 describe("QuizExperience", () => {
+  let storage: Storage;
+
+  beforeEach(() => {
+    storage = createMemoryStorage();
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      value: storage,
+    });
+  });
+
   it("lets a user answer the first question and see feedback", () => {
     render(<QuizExperience />);
 
@@ -112,8 +123,31 @@ describe("QuizExperience", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
 
-    expect(screen.getByText("Saved 2-1")).toBeInTheDocument();
+    expect(screen.getByText("Saved 2-1 locally")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
+  });
+
+  it("restores a locally saved score prediction on load", async () => {
+    saveLocalScorePrediction(storage, {
+      id: "local-mock-serie-a-nap-int-2026-05-16",
+      fixtureId: "mock-serie-a-nap-int-2026-05-16",
+      userId: "local-user",
+      submittedAt: "2026-05-12T00:00:00.000Z",
+      score: {
+        home: 3,
+        away: 0,
+      },
+    });
+
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Leaderboard" }));
+
+    expect(
+      await screen.findByText("Restored 3-0 from this device"),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Napoli score")).toHaveValue(3);
+    expect(screen.getByLabelText("Inter score")).toHaveValue(0);
   });
 
   it("renders a deliberate fallback when question media is missing", () => {
@@ -134,3 +168,28 @@ describe("QuizExperience", () => {
     ).toHaveTextContent("Provider required");
   });
 });
+
+function createMemoryStorage(): Storage {
+  const values = new Map<string, string>();
+
+  return {
+    get length() {
+      return values.size;
+    },
+    clear() {
+      values.clear();
+    },
+    getItem(key: string) {
+      return values.get(key) ?? null;
+    },
+    key(index: number) {
+      return Array.from(values.keys())[index] ?? null;
+    },
+    removeItem(key: string) {
+      values.delete(key);
+    },
+    setItem(key: string, value: string) {
+      values.set(key, value);
+    },
+  };
+}
