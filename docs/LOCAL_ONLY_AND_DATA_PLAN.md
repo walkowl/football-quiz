@@ -63,6 +63,7 @@ The local mock layer now includes:
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.
 - A local completed-quiz history so the profile still reflects prior finished packs after the user starts the next quiz.
+- Local quality checks for mock media paths, media weight, prediction fixtures, fixture dates, final scores, and mock prediction/member links.
 
 This is enough to keep building locally while the quiz contract stabilizes. It is not yet enough to pay for a football data provider.
 
