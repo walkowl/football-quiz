@@ -59,6 +59,7 @@ import {
   type QuizOutcome,
   type QuizPack,
   type QuizQuestion,
+  type RecommendedPack,
 } from "../../domain/quiz";
 import {
   clearLocalScorePrediction,
@@ -192,6 +193,11 @@ export function QuizExperience() {
     profile: fanProfile,
     totalQuestions: quizQuestions.length,
   });
+  const nextHomePack = isComplete
+    ? recommendPacks(fanProfile).find(
+        (pack) => localPackIds.has(pack.id) && pack.id !== activePack.id,
+      )
+    : undefined;
 
   function startPack(packId: string) {
     const completedAttempts = isComplete
@@ -372,7 +378,9 @@ export function QuizExperience() {
               answeredCount={answeredCount}
               fixture={scheduledPredictionFixture}
               isComplete={isComplete}
+              nextPack={nextHomePack}
               onNavigate={setActiveView}
+              onStartPack={startPack}
               profileSummary={localProfileSummary}
               savedPrediction={predictionUi.savedPrediction}
               totalQuestions={quizQuestions.length}
@@ -759,10 +767,12 @@ interface LocalHomeScreenProps {
   answeredCount: number;
   fixture?: PredictionFixture;
   isComplete: boolean;
+  nextPack?: RecommendedPack;
   profileSummary: LocalProfileSummary;
   savedPrediction?: ScorePrediction;
   totalQuestions: number;
   onNavigate: (view: AppView) => void;
+  onStartPack: (packId: string) => void;
 }
 
 function LocalHomeScreen({
@@ -770,14 +780,21 @@ function LocalHomeScreen({
   answeredCount,
   fixture,
   isComplete,
+  nextPack,
   profileSummary,
   savedPrediction,
   totalQuestions,
   onNavigate,
+  onStartPack,
 }: LocalHomeScreenProps) {
   const quizProgressLabel = isComplete
     ? "Pack complete"
     : `${answeredCount}/${totalQuestions} questions`;
+  const quizShortcutLabel = nextPack ? "Next quiz" : "Continue quiz";
+  const quizShortcutCopy = nextPack
+    ? `${nextPack.title} / ${nextPack.description}`
+    : `${activePack.subtitle} / ${quizProgressLabel}`;
+  const quizShortcutValue = nextPack ? "Play" : isComplete ? "Result" : "Play";
   const savedPickLabel =
     savedPrediction && fixture
       ? `${fixture.homeTeam.shortName} ${savedPrediction.score.home}-${savedPrediction.score.away} ${fixture.awayTeam.shortName}`
@@ -816,11 +833,13 @@ function LocalHomeScreen({
 
       <section className="home-shortcuts" aria-label="Home shortcuts">
         <HomeShortcut
-          copy={`${activePack.subtitle} / ${quizProgressLabel}`}
+          copy={quizShortcutCopy}
           icon={Play}
-          label="Continue quiz"
-          onOpen={() => onNavigate("play")}
-          value={isComplete ? "Result" : "Play"}
+          label={quizShortcutLabel}
+          onOpen={() =>
+            nextPack ? onStartPack(nextPack.id) : onNavigate("play")
+          }
+          value={quizShortcutValue}
         />
         <HomeShortcut
           copy={`Overall: ${profileSummary.playerBenchmark.label} / ${profileSummary.historyLabel}`}

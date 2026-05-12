@@ -58,7 +58,7 @@ The local mock layer now includes:
 - A weekly pulse pack shaped like recent-result, player-form, and table-movement content.
 - Image-led questions for the preferred visual loop.
 - Text-only questions for provider, licensing, or missing-photo cases.
-- A local next-pack handoff from the first-run result screen into Weekly Pulse.
+- A local next-pack handoff from the first-run result screen and Home hub into Weekly Pulse.
 - A player-relative result benchmark, such as `Better than X% of players`, instead of meaningless score totals.
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.

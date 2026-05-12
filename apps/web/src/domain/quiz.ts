@@ -229,15 +229,15 @@ export function getFeedback(question: QuizQuestion, selectedOptionId: string) {
 export function recommendationCopy(outcome: QuizOutcome) {
   switch (outcome.level) {
     case "Advanced Fan":
-      return "Start with current form, market-value traps, and transfer logic. You can handle the sharp stuff.";
+      return "Try form, values, and transfer logic next.";
     case "Daily Follower":
-      return "Mix results, tables, transfers, and one difficult player-value question each session.";
+      return "Mix results, tables, transfers, and one hard value question.";
     case "Intermediate Fan":
-      return "Anchor the next quiz around your favourite league, then add one weekly news question.";
+      return "Favourite league plus one news question.";
     case "Casual Fan":
-      return "Keep the next quiz around famous players, big clubs, and national-team moments.";
+      return "Famous players, big clubs, national-team moments.";
     case "Newbie":
-      return "Start with superstar players, major clubs, and simple match-result questions.";
+      return "Superstars, major clubs, simple results.";
   }
 }
 

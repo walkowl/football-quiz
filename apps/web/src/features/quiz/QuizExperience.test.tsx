@@ -141,6 +141,32 @@ describe("QuizExperience", () => {
     expect(screen.getByLabelText("0% complete")).toBeInTheDocument();
   });
 
+  it("promotes the next local pack from Home after a quiz is complete", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Bayer Leverkusen" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "20-year-old elite winger" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Reveal profile/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+
+    expect(screen.getByRole("heading", { name: "Next quiz" })).toBeVisible();
+    expect(screen.getByText(/Weekly Pulse/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Open Next quiz" }));
+
+    expect(
+      screen.getByRole("heading", {
+        name: "Who won the featured derby in this week's local pulse?",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("0% complete")).toBeInTheDocument();
+  });
+
   it("restarts the active quiz and lets result topics be tuned", () => {
     render(<QuizExperience />);
 
