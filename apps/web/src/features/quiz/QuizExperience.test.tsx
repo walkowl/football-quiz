@@ -4,6 +4,7 @@ import {
   readLocalScorePrediction,
   saveLocalScorePrediction,
 } from "./localPredictionStorage";
+import { readLocalQuizProgress } from "./localQuizProgressStorage";
 import { QuestionMedia, QuizExperience } from "./QuizExperience";
 
 describe("QuizExperience", () => {
@@ -49,6 +50,29 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Advanced Fan" }),
     ).toBeInTheDocument();
+  });
+
+  it("persists completed quiz progress and restores it on reload", () => {
+    const { unmount } = render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Cristiano Ronaldo" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Bayer Leverkusen" }));
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "20-year-old elite winger" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Reveal profile/ }));
+
+    expect(readLocalQuizProgress(storage)?.questionIndex).toBe(3);
+
+    unmount();
+    render(<QuizExperience />);
+    fireEvent.click(screen.getByRole("button", { name: "Profile" }));
+
+    expect(screen.getAllByText("Advanced Fan").length).toBeGreaterThan(0);
+    expect(screen.getByLabelText("Questions 3/3")).toBeInTheDocument();
+    expect(screen.getByLabelText("Quiz accuracy 100%")).toBeInTheDocument();
   });
 
   it("starts the local weekly pulse pack from the result screen", () => {

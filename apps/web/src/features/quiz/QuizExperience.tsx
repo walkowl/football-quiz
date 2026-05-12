@@ -22,7 +22,7 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   firstRunQuizPack,
   localMockQuizPacks,
@@ -62,6 +62,12 @@ import {
   readLocalScorePrediction,
   saveLocalScorePrediction,
 } from "./localPredictionStorage";
+import {
+  getBrowserQuizProgressStorage,
+  readLocalQuizProgress,
+  saveLocalQuizProgress,
+  type LocalQuizProgress,
+} from "./localQuizProgressStorage";
 
 const localPackById = new Map(
   localMockQuizPacks.map((pack) => [pack.id, pack]),
@@ -77,12 +83,21 @@ const defaultPredictionDraft: ScoreLine = {
   home: 1,
   away: 1,
 };
+const defaultSelectedTopics = ["premier-league", "transfers"];
+const topicIds = new Set(topicOptions.map((topic) => topic.id));
 const scheduledPredictionFixture = mockPredictionFixtures.find(
   (fixture) => fixture.status === "scheduled",
 );
 
 type AppView = "play" | "leaderboard" | "profile";
 type PredictionSaveState = "draft" | "saved" | "restored" | "unavailable";
+
+interface QuizUiState {
+  activePackId: string;
+  answers: AnswerMap;
+  questionIndex: number;
+  selectedTopics: string[];
+}
 
 interface PredictionUiState {
   draft: ScoreLine;
@@ -92,16 +107,33 @@ interface PredictionUiState {
 
 export function QuizExperience() {
   const [activeView, setActiveView] = useState<AppView>("play");
-  const [activePackId, setActivePackId] = useState(firstRunQuizPack.id);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<AnswerMap>({});
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([
-    "premier-league",
-    "transfers",
-  ]);
-  const [predictionUi, setPredictionUi] = useState<PredictionUiState>(
-    getInitialPredictionUiState,
+  const [quizUiOverride, setQuizUiOverride] = useState<QuizUiState | undefined>(
+    undefined,
   );
+  const [predictionUiOverride, setPredictionUiOverride] = useState<
+    PredictionUiState | undefined
+  >(undefined);
+  const storedQuizSnapshot = useSyncExternalStore(
+    subscribeToLocalBrowserStorage,
+    getStoredQuizSnapshot,
+    getEmptyStorageSnapshot,
+  );
+  const storedPredictionSnapshot = useSyncExternalStore(
+    subscribeToLocalBrowserStorage,
+    getStoredPredictionSnapshot,
+    getEmptyStorageSnapshot,
+  );
+  const storedQuizUi = useMemo(
+    () => getStoredQuizUiState(storedQuizSnapshot),
+    [storedQuizSnapshot],
+  );
+  const storedPredictionUi = useMemo(
+    () => getStoredPredictionUiState(storedPredictionSnapshot),
+    [storedPredictionSnapshot],
+  );
+  const quizUi = quizUiOverride ?? storedQuizUi;
+  const predictionUi = predictionUiOverride ?? storedPredictionUi;
+  const { activePackId, answers, questionIndex, selectedTopics } = quizUi;
 
   const activePack = localPackById.get(activePackId) ?? firstRunQuizPack;
   const quizQuestions = activePack.questions;
@@ -148,10 +180,15 @@ export function QuizExperience() {
   );
 
   function startPack(packId: string) {
+    const nextState = {
+      activePackId: packId,
+      answers: {},
+      questionIndex: 0,
+      selectedTopics,
+    };
+
     setActiveView("play");
-    setActivePackId(packId);
-    setQuestionIndex(0);
-    setAnswers({});
+    commitQuizUiState(nextState);
   }
 
   function selectAnswer(optionId: string) {
@@ -159,14 +196,20 @@ export function QuizExperience() {
       return;
     }
 
-    setAnswers((currentAnswers) => ({
-      ...currentAnswers,
-      [currentQuestion.id]: optionId,
-    }));
+    commitQuizUiState({
+      ...quizUi,
+      answers: {
+        ...answers,
+        [currentQuestion.id]: optionId,
+      },
+    });
   }
 
   function goNext() {
-    setQuestionIndex((index) => index + 1);
+    commitQuizUiState({
+      ...quizUi,
+      questionIndex: questionIndex + 1,
+    });
   }
 
   function restart() {
@@ -175,11 +218,19 @@ export function QuizExperience() {
   }
 
   function toggleTopic(topicId: string) {
-    setSelectedTopics((currentTopics) =>
-      currentTopics.includes(topicId)
-        ? currentTopics.filter((id) => id !== topicId)
-        : [...currentTopics, topicId],
-    );
+    const nextTopics = selectedTopics.includes(topicId)
+      ? selectedTopics.filter((id) => id !== topicId)
+      : [...selectedTopics, topicId];
+
+    commitQuizUiState({
+      ...quizUi,
+      selectedTopics: nextTopics,
+    });
+  }
+
+  function commitQuizUiState(nextState: QuizUiState) {
+    setQuizUiOverride(nextState);
+    saveQuizUiState(nextState);
   }
 
   return (
@@ -280,10 +331,10 @@ export function QuizExperience() {
               fixture={scheduledPredictionFixture}
               lockState={scheduledPredictionLockState}
               onDraftChange={(draft) =>
-                setPredictionUi((currentState) => ({
-                  ...currentState,
+                setPredictionUiOverride({
+                  ...predictionUi,
                   draft,
-                }))
+                })
               }
               onSave={() => {
                 if (
@@ -308,11 +359,11 @@ export function QuizExperience() {
                   ? "saved"
                   : "unavailable";
 
-                setPredictionUi((currentState) => ({
-                  ...currentState,
+                setPredictionUiOverride({
+                  ...predictionUi,
                   savedPrediction: nextPrediction,
                   saveState,
-                }));
+                });
               }}
               onClear={() => {
                 if (!scheduledPredictionFixture) {
@@ -324,7 +375,7 @@ export function QuizExperience() {
                   scheduledPredictionFixture.id,
                 );
 
-                setPredictionUi({
+                setPredictionUiOverride({
                   draft: defaultPredictionDraft,
                   saveState: "draft",
                   savedPrediction: undefined,
@@ -1050,7 +1101,59 @@ function scoresEqual(left: ScoreLine, right: ScoreLine) {
   return left.home === right.home && left.away === right.away;
 }
 
-function getInitialPredictionUiState(): PredictionUiState {
+function getStoredQuizUiState(snapshot: string): QuizUiState {
+  const storedProgress = parseQuizProgressSnapshot(snapshot);
+
+  if (!storedProgress) {
+    return createDefaultQuizUiState();
+  }
+
+  const activePack =
+    localPackById.get(storedProgress.activePackId) ?? firstRunQuizPack;
+
+  return {
+    activePackId: activePack.id,
+    answers: normalizeStoredAnswers(activePack, storedProgress.answers),
+    questionIndex: Math.min(
+      storedProgress.questionIndex,
+      activePack.questions.length,
+    ),
+    selectedTopics: normalizeStoredTopics(storedProgress.selectedTopics),
+  };
+}
+
+function createDefaultQuizUiState(): QuizUiState {
+  return {
+    activePackId: firstRunQuizPack.id,
+    answers: {},
+    questionIndex: 0,
+    selectedTopics: defaultSelectedTopics,
+  };
+}
+
+function createDefaultPredictionUiState(): PredictionUiState {
+  return {
+    draft: defaultPredictionDraft,
+    saveState: "draft",
+    savedPrediction: undefined,
+  };
+}
+
+function subscribeToLocalBrowserStorage() {
+  return () => undefined;
+}
+
+function getEmptyStorageSnapshot() {
+  return "";
+}
+
+function getStoredQuizSnapshot() {
+  const storedProgress = readLocalQuizProgress(getBrowserQuizProgressStorage());
+
+  return storedProgress ? JSON.stringify(storedProgress) : "";
+}
+
+function getStoredPredictionSnapshot() {
   const storedPrediction = scheduledPredictionFixture
     ? readLocalScorePrediction(
         getBrowserPredictionStorage(),
@@ -1058,11 +1161,78 @@ function getInitialPredictionUiState(): PredictionUiState {
       )
     : undefined;
 
+  return storedPrediction ? JSON.stringify(storedPrediction) : "";
+}
+
+function getStoredPredictionUiState(snapshot: string): PredictionUiState {
+  const storedPrediction = parsePredictionSnapshot(snapshot);
+
+  if (!storedPrediction) {
+    return createDefaultPredictionUiState();
+  }
+
   return {
-    draft: storedPrediction?.score ?? defaultPredictionDraft,
+    draft: storedPrediction.score,
     savedPrediction: storedPrediction,
-    saveState: storedPrediction ? "restored" : "draft",
+    saveState: "restored",
   };
+}
+
+function parseQuizProgressSnapshot(snapshot: string) {
+  if (!snapshot) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(snapshot) as LocalQuizProgress;
+  } catch {
+    return undefined;
+  }
+}
+
+function parsePredictionSnapshot(snapshot: string) {
+  if (!snapshot) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(snapshot) as ScorePrediction;
+  } catch {
+    return undefined;
+  }
+}
+
+function saveQuizUiState(state: QuizUiState) {
+  const progress: LocalQuizProgress = {
+    ...state,
+    updatedAt: new Date().toISOString(),
+  };
+
+  saveLocalQuizProgress(getBrowserQuizProgressStorage(), progress);
+}
+
+function normalizeStoredAnswers(pack: QuizPack, answers: AnswerMap) {
+  return pack.questions.reduce<AnswerMap>((validAnswers, question) => {
+    const selectedOptionId = answers[question.id];
+
+    if (
+      selectedOptionId &&
+      question.options.some((option) => option.id === selectedOptionId)
+    ) {
+      validAnswers[question.id] = selectedOptionId;
+    }
+
+    return validAnswers;
+  }, {});
+}
+
+function normalizeStoredTopics(selectedTopics: string[]) {
+  const topics = selectedTopics.filter(
+    (topicId, index) =>
+      topicIds.has(topicId) && selectedTopics.indexOf(topicId) === index,
+  );
+
+  return topics.length > 0 ? topics : defaultSelectedTopics;
 }
 
 function formatFixtureDate(value: string) {

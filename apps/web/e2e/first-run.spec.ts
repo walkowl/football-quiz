@@ -36,6 +36,14 @@ test("first-run quiz can be completed on a mobile viewport", async ({
   await expect(page.getByLabel("Fan profile summary")).toContainText("100%");
   await expect(page.getByText("Next packs")).toBeVisible();
 
+  await page.reload();
+  await page.getByRole("button", { name: "Profile" }).tap();
+  await expect(
+    page.getByRole("region", { name: "Local profile" }),
+  ).toContainText("Advanced Fan");
+  await expect(page.getByLabel("Questions 3/3")).toBeVisible();
+  await expect(page.getByLabel("Quiz accuracy 100%")).toBeVisible();
+
   await page.getByRole("button", { name: "Start Weekly Pulse" }).tap();
   await expect(
     page.getByRole("heading", {

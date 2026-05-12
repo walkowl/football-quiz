@@ -12,6 +12,7 @@ const sourceFiles = [
   "apps/web/src/domain/quiz.ts",
   "apps/web/src/features/quiz/QuizExperience.tsx",
   "apps/web/src/features/quiz/localPredictionStorage.ts",
+  "apps/web/src/features/quiz/localQuizProgressStorage.ts",
 ];
 
 const violations = [];
