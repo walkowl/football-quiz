@@ -1,4 +1,4 @@
-import type { QuizQuestion, TopicOption } from "../domain/quiz";
+import type { QuizPack, QuizQuestion, TopicOption } from "../domain/quiz";
 
 export const mockQuestions: QuizQuestion[] = [
   {
@@ -114,6 +114,13 @@ export const mockQuestions: QuizQuestion[] = [
     tags: ["market-values", "transfers", "advanced"],
   },
 ];
+
+export const firstRunQuizPack: QuizPack = {
+  id: "mock-legend-challenge",
+  title: "Legend Challenge",
+  subtitle: "Three fast questions to estimate your football level.",
+  questions: mockQuestions,
+};
 
 export const topicOptions: TopicOption[] = [
   {

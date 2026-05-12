@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { QuizExperience } from "./QuizExperience";
+import { QuestionMedia, QuizExperience } from "./QuizExperience";
 
 describe("QuizExperience", () => {
   it("lets a user answer the first question and see feedback", () => {
@@ -27,5 +27,13 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Advanced Fan" }),
     ).toBeInTheDocument();
+  });
+
+  it("renders a deliberate fallback when question media is missing", () => {
+    render(<QuestionMedia />);
+
+    expect(
+      screen.getByRole("img", { name: "No question photo available" }),
+    ).toHaveTextContent("Photo unavailable");
   });
 });

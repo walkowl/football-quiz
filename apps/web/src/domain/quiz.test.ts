@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { classifyKnowledge, evaluateQuiz, getFeedback } from "./quiz";
+import {
+  buildFanProfile,
+  classifyKnowledge,
+  evaluateQuiz,
+  getFeedback,
+  recommendPacks,
+} from "./quiz";
 import { mockQuestions } from "../data/mockFootballData";
 
 describe("quiz domain", () => {
@@ -38,5 +44,31 @@ describe("quiz domain", () => {
 
     expect(feedback).toContain("Not this time");
     expect(feedback).toContain("Cristiano Ronaldo");
+  });
+
+  it("builds a fan profile from correct answers and selected topics", () => {
+    const answers = Object.fromEntries(
+      mockQuestions.map((question) => [question.id, question.correctOptionId]),
+    );
+
+    const profile = buildFanProfile(mockQuestions, answers, [
+      "national-team",
+      "market-values",
+    ]);
+
+    expect(profile.accuracy).toBe(100);
+    expect(profile.level).toBe("Advanced Fan");
+    expect(profile.strongestSignals).toContain("national-team");
+  });
+
+  it("prioritizes recommended packs from selected topics", () => {
+    const packs = recommendPacks({
+      accuracy: 67,
+      level: "Intermediate Fan",
+      selectedTopics: ["market-values"],
+      strongestSignals: ["transfers"],
+    });
+
+    expect(packs[0]?.id).toBe("transfer-radar");
   });
 });

@@ -5,6 +5,7 @@ import {
   Check,
   ChevronRight,
   Circle,
+  Flame,
   Home,
   Play,
   RotateCcw,
@@ -17,15 +18,20 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
-import { mockQuestions, topicOptions } from "../../data/mockFootballData";
+import { firstRunQuizPack, topicOptions } from "../../data/mockFootballData";
 import {
+  buildFanProfile,
   evaluateQuiz,
   getFeedback,
   isCorrect,
+  recommendPacks,
   recommendationCopy,
   type AnswerMap,
   type QuizMedia,
+  type QuizQuestion,
 } from "../../domain/quiz";
+
+const quizQuestions = firstRunQuizPack.questions;
 
 export function QuizExperience() {
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -35,21 +41,25 @@ export function QuizExperience() {
     "transfers",
   ]);
 
-  const currentQuestion = mockQuestions[questionIndex];
+  const currentQuestion = quizQuestions[questionIndex];
   const selectedAnswer = currentQuestion
     ? answers[currentQuestion.id]
     : undefined;
-  const isComplete = questionIndex >= mockQuestions.length;
+  const isComplete = questionIndex >= quizQuestions.length;
   const answeredCount = Object.keys(answers).length;
-  const progress = Math.round((answeredCount / mockQuestions.length) * 100);
+  const progress = Math.round((answeredCount / quizQuestions.length) * 100);
   const displayQuestionNumber = Math.min(
     questionIndex + 1,
-    mockQuestions.length,
+    quizQuestions.length,
   );
 
   const outcome = useMemo(
-    () => evaluateQuiz(mockQuestions, answers),
+    () => evaluateQuiz(quizQuestions, answers),
     [answers],
+  );
+  const fanProfile = useMemo(
+    () => buildFanProfile(quizQuestions, answers, selectedTopics),
+    [answers, selectedTopics],
   );
   const score = outcome.weightedScore * 420;
 
@@ -129,7 +139,7 @@ export function QuizExperience() {
             <span>
               {isComplete
                 ? "Profile ready"
-                : `Question ${displayQuestionNumber}/${mockQuestions.length}`}
+                : `Question ${displayQuestionNumber}/${quizQuestions.length}`}
             </span>
             <strong>00:14</strong>
             <span>Score: {score}</span>
@@ -148,6 +158,7 @@ export function QuizExperience() {
             <ResultCard
               onRestart={restart}
               onToggleTopic={toggleTopic}
+              profile={fanProfile}
               outcome={outcome}
               selectedTopics={selectedTopics}
             />
@@ -161,7 +172,7 @@ export function QuizExperience() {
 }
 
 interface QuestionCardProps {
-  question: (typeof mockQuestions)[number];
+  question: QuizQuestion;
   selectedAnswer?: string;
   onSelectAnswer: (optionId: string) => void;
   onNext: () => void;
@@ -244,7 +255,7 @@ function QuestionCard({
         onClick={onNext}
         type="button"
       >
-        {question.id === mockQuestions.at(-1)?.id
+        {question.id === quizQuestions.at(-1)?.id
           ? "Reveal profile"
           : "Next question"}
         <ChevronRight aria-hidden="true" size={18} />
@@ -253,7 +264,7 @@ function QuestionCard({
   );
 }
 
-function QuestionMedia({ media }: { media?: QuizMedia }) {
+export function QuestionMedia({ media }: { media?: QuizMedia }) {
   if (!media) {
     return (
       <div
@@ -282,6 +293,7 @@ function QuestionMedia({ media }: { media?: QuizMedia }) {
 
 interface ResultCardProps {
   outcome: ReturnType<typeof evaluateQuiz>;
+  profile: ReturnType<typeof buildFanProfile>;
   selectedTopics: string[];
   onRestart: () => void;
   onToggleTopic: (topicId: string) => void;
@@ -289,10 +301,13 @@ interface ResultCardProps {
 
 function ResultCard({
   outcome,
+  profile,
   selectedTopics,
   onRestart,
   onToggleTopic,
 }: ResultCardProps) {
+  const packs = recommendPacks(profile);
+
   return (
     <section className="result-card" aria-label="Quiz result">
       <div className="result-topline">
@@ -311,6 +326,17 @@ function ResultCard({
 
       <h2 className="level">{outcome.level}</h2>
       <p className="result-copy">{recommendationCopy(outcome)}</p>
+
+      <div className="profile-panel" aria-label="Fan profile summary">
+        <div>
+          <span className="profile-value">{profile.accuracy}%</span>
+          <span className="profile-label">accuracy</span>
+        </div>
+        <div>
+          <span className="profile-value">{profile.strongestSignals[0]}</span>
+          <span className="profile-label">strongest signal</span>
+        </div>
+      </div>
 
       <div className="personalize-header">
         <SlidersHorizontal aria-hidden="true" size={18} />
@@ -333,6 +359,22 @@ function ResultCard({
             </button>
           );
         })}
+      </div>
+
+      <div className="personalize-header">
+        <Flame aria-hidden="true" size={18} />
+        <span>Next packs</span>
+      </div>
+      <div className="pack-list">
+        {packs.map((pack) => (
+          <article className="pack-row" key={pack.id}>
+            <div>
+              <h3>{pack.title}</h3>
+              <p>{pack.description}</p>
+            </div>
+            <span>{pack.freshness}</span>
+          </article>
+        ))}
       </div>
     </section>
   );

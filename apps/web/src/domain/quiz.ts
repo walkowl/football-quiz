@@ -41,6 +41,13 @@ export interface QuizQuestion {
   tags: string[];
 }
 
+export interface QuizPack {
+  id: string;
+  title: string;
+  subtitle: string;
+  questions: QuizQuestion[];
+}
+
 export interface TopicOption {
   id: string;
   label: string;
@@ -54,6 +61,20 @@ export interface QuizOutcome {
   totalQuestions: number;
   weightedScore: number;
   level: KnowledgeLevel;
+}
+
+export interface FanProfile {
+  level: KnowledgeLevel;
+  accuracy: number;
+  strongestSignals: string[];
+  selectedTopics: string[];
+}
+
+export interface RecommendedPack {
+  id: string;
+  title: string;
+  description: string;
+  freshness: string;
 }
 
 const difficultyWeight: Record<Difficulty, number> = {
@@ -154,4 +175,84 @@ export function recommendationCopy(outcome: QuizOutcome) {
     case "Newbie":
       return "Start with superstar players, major clubs, and simple match-result questions.";
   }
+}
+
+export function buildFanProfile(
+  questions: QuizQuestion[],
+  answers: AnswerMap,
+  selectedTopics: string[],
+): FanProfile {
+  const outcome = evaluateQuiz(questions, answers);
+  const correctTags = questions.flatMap((question) => {
+    const selectedOptionId = answers[question.id];
+
+    if (!selectedOptionId || !isCorrect(question, selectedOptionId)) {
+      return [];
+    }
+
+    return question.tags;
+  });
+  const strongestSignals = rankTags([...correctTags, ...selectedTopics]).slice(
+    0,
+    3,
+  );
+
+  return {
+    level: outcome.level,
+    accuracy:
+      outcome.totalQuestions === 0
+        ? 0
+        : Math.round((outcome.correctCount / outcome.totalQuestions) * 100),
+    strongestSignals:
+      strongestSignals.length > 0 ? strongestSignals : ["starter-pack"],
+    selectedTopics,
+  };
+}
+
+export function recommendPacks(profile: FanProfile): RecommendedPack[] {
+  const packs: RecommendedPack[] = [
+    {
+      id: "weekly-pulse",
+      title: "Weekly Pulse",
+      description: "Recent results, scorers, table movement, and form traps.",
+      freshness: "Refresh weekly",
+    },
+    {
+      id: "transfer-radar",
+      title: "Transfer Radar",
+      description: "Confirmed moves, rumours, and market-value comparisons.",
+      freshness: "Needs provider",
+    },
+    {
+      id: "nation-hook",
+      title: "Nation Hook",
+      description:
+        "National-team players, heroes, and country-first questions.",
+      freshness: "Good for onboarding",
+    },
+  ];
+
+  if (profile.selectedTopics.includes("market-values")) {
+    return [packs[1]!, packs[0]!, packs[2]!];
+  }
+
+  if (profile.selectedTopics.includes("national-team")) {
+    return [packs[2]!, packs[0]!, packs[1]!];
+  }
+
+  return packs;
+}
+
+function rankTags(tags: string[]) {
+  const counts = new Map<string, number>();
+
+  for (const tag of tags) {
+    counts.set(tag, (counts.get(tag) ?? 0) + 1);
+  }
+
+  return [...counts.entries()]
+    .sort(
+      (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
+    )
+    .map(([tag]) => tag);
 }
