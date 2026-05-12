@@ -14,6 +14,7 @@ This repository is at project-boundary stage. The first commit defines the produ
 - Platform strategy is defined in [docs/PLATFORM_STRATEGY.md](docs/PLATFORM_STRATEGY.md).
 - Visual direction is defined in [docs/VISUAL_DIRECTION.md](docs/VISUAL_DIRECTION.md).
 - Future football data boundaries are defined in [docs/CONTENT_PROVIDER_BOUNDARY.md](docs/CONTENT_PROVIDER_BOUNDARY.md).
+- Local quality is defined in [docs/QUALITY_PIPELINE.md](docs/QUALITY_PIPELINE.md).
 - Engineering guardrails are defined in [docs/ENGINEERING_GUARDRAILS.md](docs/ENGINEERING_GUARDRAILS.md).
 - The local-first quality path is defined in [docs/LOCAL_QUALITY_PATH.md](docs/LOCAL_QUALITY_PATH.md).
 - Architecture decisions will be tracked in [docs/decisions](docs/decisions).

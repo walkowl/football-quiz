@@ -29,4 +29,6 @@ mockups/
 # Logs and reports
 *.log
 coverage/
+playwright-report/
+test-results/
 reports/

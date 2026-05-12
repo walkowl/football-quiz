@@ -21,7 +21,11 @@ For the current web prototype, the gate runs:
 - Prettier format check.
 - ESLint for the web app.
 - TypeScript type checking.
+- Architecture boundary checks.
 - Vitest unit and component tests.
+- Coverage threshold checks.
+- Playwright mobile browser E2E tests.
+- Basic automated accessibility scan.
 - Next.js production build.
 - NPM high-severity audit.
 

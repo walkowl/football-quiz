@@ -50,6 +50,7 @@ require_file "docs/PROJECT_BOUNDARIES.md"
 require_file "docs/PLATFORM_STRATEGY.md"
 require_file "docs/VISUAL_DIRECTION.md"
 require_file "docs/CONTENT_PROVIDER_BOUNDARY.md"
+require_file "docs/QUALITY_PIPELINE.md"
 require_file "docs/references/preferred-mobile-quiz-direction.jpeg"
 require_file "docs/LOCAL_ONLY_AND_DATA_PLAN.md"
 require_file "docs/ENGINEERING_GUARDRAILS.md"
@@ -84,8 +85,10 @@ if [[ -f "package.json" ]]; then
     npm run format:check --if-present
     npm run lint --if-present
     npm run typecheck --if-present
-    npm test --if-present
+    npm run quality:architecture --if-present
+    npm run test:coverage --if-present
     npm run build --if-present
+    npm run test:e2e --if-present
     npm audit --audit-level=high
   else
     fail "package.json exists but npm is not available"
