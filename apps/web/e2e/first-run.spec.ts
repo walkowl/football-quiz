@@ -70,6 +70,8 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(page.getByLabel("Prediction league status")).toContainText(
     "Rewards locked",
   );
+  await expect(page.getByText("Open for picks")).toBeVisible();
+  await expect(page.getByText("Locks May 16, 06:45 PM UTC")).toBeVisible();
 
   await page.getByLabel("Napoli score").fill("2");
   await page.getByLabel("Inter score").fill("1");

@@ -862,6 +862,41 @@ button {
   line-height: 1.35;
 }
 
+.prediction-lock-card {
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(29, 184, 102, 0.36);
+  border-radius: 13px;
+  background: rgba(29, 184, 102, 0.1);
+  color: #9dffc8;
+  padding: 9px 10px;
+}
+
+.prediction-lock-card.locked {
+  border-color: rgba(225, 91, 79, 0.42);
+  background: rgba(225, 91, 79, 0.12);
+  color: #ffb4ad;
+}
+
+.prediction-lock-card span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.prediction-lock-card small {
+  overflow: hidden;
+  color: rgba(246, 244, 238, 0.62);
+  font-size: 0.66rem;
+  font-weight: 760;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .score-input-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -879,6 +914,10 @@ button {
   background: rgba(5, 7, 10, 0.28);
   color: var(--ink);
   padding: 8px;
+}
+
+.score-input.locked {
+  opacity: 0.72;
 }
 
 .score-input span {
@@ -909,6 +948,10 @@ button {
   border-color: #f4aa6c;
   box-shadow: 0 0 0 2px rgba(217, 121, 55, 0.18);
   outline: none;
+}
+
+.score-input input:disabled {
+  cursor: not-allowed;
 }
 
 .prediction-actions {
@@ -948,6 +991,12 @@ button {
   background: rgba(225, 91, 79, 0.13);
   outline: none;
   transform: translateY(-1px);
+}
+
+.clear-prediction-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+  transform: none;
 }
 
 .saved-prediction {

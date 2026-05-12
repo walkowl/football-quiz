@@ -94,6 +94,7 @@ The project now has a local-only prediction domain foundation:
 - A local mobile league screen with an upcoming score-prediction form.
 - A local save flow for the current user that persists only in browser storage on this device.
 - A local edit and clear flow for correcting or removing the device-saved pick.
+- Lock-window status based on fixture lock time, with save/update blocked once locked.
 - UI copy that keeps rewards explicitly locked until compliance work exists.
 
 This is not a rewards system. It has no paid entry, prizes, balances, payouts, odds, or wager mechanics.
@@ -102,6 +103,6 @@ This is not a rewards system. It has no paid entry, prizes, balances, payouts, o
 
 The bottom navigation now exposes a `Leaderboard` view inside the same mobile shell as the quiz. It shows the local prediction league using the mock fixture pack, the current scoring rules, and the in-memory saved prediction for the local user.
 
-The current user can enter a home and away score for the next scheduled mock fixture. Saving the prediction writes a versioned local-storage record in the browser so the pick survives a refresh on this device. The current user can update that local pick or clear it from this device. It does not create an account, persist to a database, send to an API, join a real league, or unlock any reward.
+The current user can enter a home and away score for the next scheduled mock fixture while the local lock window is open. Saving the prediction writes a versioned local-storage record in the browser so the pick survives a refresh on this device. The current user can update that local pick or clear it from this device before lock. It does not create an account, persist to a database, send to an API, join a real league, or unlock any reward.
 
 The good time to connect real match, player, and result data is after the local quiz and prediction loops both survive the full quality gate with their mock contracts. At that point the provider adapter can replace mock data without changing the product surface.

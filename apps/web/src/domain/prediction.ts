@@ -79,6 +79,13 @@ export interface PredictionLeagueEntry {
   scoredPredictions: number;
 }
 
+export interface PredictionLockState {
+  status: "open" | "locked";
+  lockAt: string;
+  currentTime: string;
+  reason: string;
+}
+
 export const defaultPredictionScoringRules: PredictionScoringRules = {
   exactScorePoints: 5,
   correctOutcomePoints: 2,
@@ -192,6 +199,24 @@ export function getScoreOutcome(score: ScoreLine): ScoreOutcome {
   }
 
   return "draw";
+}
+
+export function getPredictionLockState(
+  fixture: PredictionFixture,
+  currentTime: string,
+): PredictionLockState {
+  const locked =
+    fixture.status !== "scheduled" ||
+    Date.parse(currentTime) >= Date.parse(fixture.lockAt);
+
+  return {
+    status: locked ? "locked" : "open",
+    lockAt: fixture.lockAt,
+    currentTime,
+    reason: locked
+      ? "Prediction window is locked."
+      : "Prediction window is open.",
+  };
 }
 
 export function isPredictionBeforeLock(

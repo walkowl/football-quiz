@@ -35,7 +35,9 @@ import {
 } from "../../data/mockPredictionData";
 import {
   buildPredictionLeaderboard,
+  getPredictionLockState,
   type PredictionFixture,
+  type PredictionLockState,
   type ScoreLine,
   type ScorePrediction,
 } from "../../domain/prediction";
@@ -67,6 +69,7 @@ const localPredictionMember = {
   displayName: "You",
 };
 const localPredictionSubmittedAt = "2026-05-12T00:00:00.000Z";
+const localPredictionClockAt = localPredictionSubmittedAt;
 const defaultPredictionDraft: ScoreLine = {
   home: 1,
   away: 1,
@@ -120,6 +123,9 @@ export function QuizExperience() {
     [answers, quizQuestions, selectedTopics],
   );
   const score = outcome.weightedScore * 420;
+  const scheduledPredictionLockState = scheduledPredictionFixture
+    ? getPredictionLockState(scheduledPredictionFixture, localPredictionClockAt)
+    : undefined;
 
   function startPack(packId: string) {
     setActiveView("play");
@@ -242,6 +248,7 @@ export function QuizExperience() {
             <PredictionLeagueScreen
               draft={predictionUi.draft}
               fixture={scheduledPredictionFixture}
+              lockState={scheduledPredictionLockState}
               onDraftChange={(draft) =>
                 setPredictionUi((currentState) => ({
                   ...currentState,
@@ -249,7 +256,10 @@ export function QuizExperience() {
                 }))
               }
               onSave={() => {
-                if (!scheduledPredictionFixture) {
+                if (
+                  !scheduledPredictionFixture ||
+                  scheduledPredictionLockState?.status === "locked"
+                ) {
                   return;
                 }
 
@@ -596,6 +606,7 @@ function ResultCard({
 interface PredictionLeagueScreenProps {
   draft: ScoreLine;
   fixture?: PredictionFixture;
+  lockState?: PredictionLockState;
   saveState: PredictionSaveState;
   savedPrediction?: ScorePrediction;
   onClear: () => void;
@@ -606,6 +617,7 @@ interface PredictionLeagueScreenProps {
 function PredictionLeagueScreen({
   draft,
   fixture,
+  lockState,
   saveState,
   savedPrediction,
   onClear,
@@ -638,8 +650,13 @@ function PredictionLeagueScreen({
   const completedFixtures = mockPredictionFixtures.filter(
     (candidate) => candidate.status === "completed",
   );
+  const predictionLocked = lockState?.status === "locked";
 
   function updateDraft(side: keyof ScoreLine, value: string) {
+    if (predictionLocked) {
+      return;
+    }
+
     const parsed = Number.parseInt(value, 10);
     const nextValue = Number.isFinite(parsed)
       ? Math.min(Math.max(parsed, 0), 12)
@@ -685,11 +702,31 @@ function PredictionLeagueScreen({
               {fixture.competition} / {fixture.matchday} /{" "}
               {formatFixtureDate(fixture.lockAt)}
             </p>
+            {lockState ? (
+              <div
+                className={`prediction-lock-card ${
+                  predictionLocked ? "locked" : ""
+                }`}
+                role="status"
+              >
+                <span>
+                  <Lock aria-hidden="true" size={15} />
+                  {predictionLocked ? "Prediction locked" : "Open for picks"}
+                </span>
+                <small>
+                  {predictionLocked ? "Locked" : "Locks"}{" "}
+                  {formatFixtureDate(lockState.lockAt)}
+                </small>
+              </div>
+            ) : null}
             <div className="score-input-grid">
-              <label className="score-input">
+              <label
+                className={`score-input ${predictionLocked ? "locked" : ""}`}
+              >
                 <span>{fixture.homeTeam.shortName}</span>
                 <input
                   aria-label={`${fixture.homeTeam.name} score`}
+                  disabled={predictionLocked}
                   inputMode="numeric"
                   max={12}
                   min={0}
@@ -700,10 +737,13 @@ function PredictionLeagueScreen({
                   value={draft.home}
                 />
               </label>
-              <label className="score-input">
+              <label
+                className={`score-input ${predictionLocked ? "locked" : ""}`}
+              >
                 <span>{fixture.awayTeam.shortName}</span>
                 <input
                   aria-label={`${fixture.awayTeam.name} score`}
+                  disabled={predictionLocked}
                   inputMode="numeric"
                   max={12}
                   min={0}
@@ -718,15 +758,21 @@ function PredictionLeagueScreen({
             <div className="prediction-actions">
               <button
                 className="primary-button prediction-save"
+                disabled={predictionLocked}
                 onClick={onSave}
                 type="button"
               >
                 <Save aria-hidden="true" size={17} />
-                {savedPrediction ? "Update prediction" : "Save prediction"}
+                {predictionLocked
+                  ? "Prediction locked"
+                  : savedPrediction
+                    ? "Update prediction"
+                    : "Save prediction"}
               </button>
               {savedPrediction ? (
                 <button
                   className="clear-prediction-button"
+                  disabled={predictionLocked}
                   onClick={onClear}
                   type="button"
                 >
@@ -741,7 +787,9 @@ function PredictionLeagueScreen({
               </p>
             ) : (
               <p className="saved-prediction">
-                Local only until the data provider boundary is ready.
+                {predictionLocked
+                  ? "Prediction window is locked for this fixture."
+                  : "Local only until the data provider boundary is ready."}
               </p>
             )}
           </>

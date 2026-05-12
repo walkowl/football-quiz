@@ -113,6 +113,8 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Score League" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Open for picks")).toBeInTheDocument();
+    expect(screen.getByText("Locks May 16, 06:45 PM UTC")).toBeInTheDocument();
     expect(screen.getAllByText("Rewards locked").length).toBeGreaterThan(0);
     expect(
       screen.queryByText(/bet|odds|wager|payout|cash/i),

@@ -6,6 +6,7 @@ import {
 } from "../data/mockPredictionData";
 import {
   buildPredictionLeaderboard,
+  getPredictionLockState,
   getScoreOutcome,
   scorePrediction,
   type PredictionFixture,
@@ -82,6 +83,37 @@ describe("prediction domain", () => {
       status: "locked",
       points: 0,
       reason: "Prediction was submitted after the lock time.",
+    });
+  });
+
+  it("reports whether scheduled prediction windows are open or locked", () => {
+    const scheduledFixture = mustFindFixture("mock-serie-a-nap-int-2026-05-16");
+
+    expect(
+      getPredictionLockState(scheduledFixture, "2026-05-12T00:00:00.000Z"),
+    ).toEqual({
+      status: "open",
+      lockAt: scheduledFixture.lockAt,
+      currentTime: "2026-05-12T00:00:00.000Z",
+      reason: "Prediction window is open.",
+    });
+
+    expect(
+      getPredictionLockState(scheduledFixture, scheduledFixture.lockAt),
+    ).toEqual({
+      status: "locked",
+      lockAt: scheduledFixture.lockAt,
+      currentTime: scheduledFixture.lockAt,
+      reason: "Prediction window is locked.",
+    });
+  });
+
+  it("keeps non-scheduled fixtures locked for prediction edits", () => {
+    expect(
+      getPredictionLockState(completedFixture, "2026-05-08T12:00:00.000Z"),
+    ).toMatchObject({
+      status: "locked",
+      reason: "Prediction window is locked.",
     });
   });
 
