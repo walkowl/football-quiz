@@ -64,6 +64,7 @@ The local mock layer now includes:
 - A Daily Matchday plan that ties an upcoming mocked fixture, a short quiz, and score prediction into the first local habit loop.
 - A Daily Matchday result handoff that sends the user from quiz completion into the local score-prediction league.
 - A saved-pick completion state that sends the user back to Home and shows the saved score in the Daily Matchday panel.
+- A Home checklist for Daily Matchday quiz state and pick state, so users can see what is pending or complete without scrolling.
 - A player-relative result benchmark, such as `Better than X% of players`, instead of meaningless score totals.
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.

@@ -265,6 +265,16 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("region", { name: "Daily Matchday" }),
     ).toHaveTextContent("Pick 2-1");
+    expect(
+      within(
+        screen.getByRole("region", { name: "Daily Matchday" }),
+      ).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Quiz pending");
+    expect(
+      within(
+        screen.getByRole("region", { name: "Daily Matchday" }),
+      ).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Pick saved");
   });
 
   it("opens the local profile tab with quiz and prediction state", () => {
@@ -340,6 +350,12 @@ describe("QuizExperience", () => {
 
     expect(dailyMatchday).toHaveTextContent("NAP vs INT");
     expect(dailyMatchday).toHaveTextContent("Serie A / Mock week 2");
+    expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Quiz pending");
+    expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Pick pending");
 
     fireEvent.click(
       within(dailyMatchday).getByRole("button", {
@@ -399,8 +415,37 @@ describe("QuizExperience", () => {
       "Use the quiz read to make a local score pick.",
     );
 
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+
+    const dailyMatchday = screen.getByRole("region", {
+      name: "Daily Matchday",
+    });
+
+    expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Quiz done");
+    expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
+    ).toHaveTextContent("Pick pending");
+
     fireEvent.click(
-      within(handoff).getByRole("button", {
+      within(dailyMatchday).getByRole("button", {
+        name: "Review Daily Matchday",
+      }),
+    );
+
+    expect(
+      screen.getByRole("region", {
+        name: "Matchday prediction handoff",
+      }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(
+      within(
+        screen.getByRole("region", {
+          name: "Matchday prediction handoff",
+        }),
+      ).getByRole("button", {
         name: "Predict Napoli vs Inter score",
       }),
     );

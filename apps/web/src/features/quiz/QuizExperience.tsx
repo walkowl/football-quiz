@@ -22,7 +22,13 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   firstRunQuizPack,
   localMockQuizPacks,
@@ -113,6 +119,13 @@ interface PredictionUiState {
   savedPrediction?: ScorePrediction;
 }
 
+interface DailyMatchdayStatus {
+  quizAction: "open" | "start";
+  quizActionLabel: string;
+  quizComplete: boolean;
+  quizStatusLabel: string;
+}
+
 export function QuizExperience() {
   const [activeView, setActiveView] = useState<AppView>("play");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -122,6 +135,7 @@ export function QuizExperience() {
   const [predictionUiOverride, setPredictionUiOverride] = useState<
     PredictionUiState | undefined
   >(undefined);
+  const screenContentRef = useRef<HTMLDivElement>(null);
   const storedQuizSnapshot = useSyncExternalStore(
     subscribeToLocalBrowserStorage,
     getStoredQuizSnapshot,
@@ -204,6 +218,26 @@ export function QuizExperience() {
         (pack) => localPackIds.has(pack.id) && pack.id !== activePack.id,
       )
     : undefined;
+  const dailyMatchdayStatus = dailyMatchdayPack
+    ? buildDailyMatchdayStatus({
+        activePack,
+        answers,
+        completedAttempts: quizUi.completedAttempts,
+        dailyPack: dailyMatchdayPack,
+        isComplete,
+      })
+    : undefined;
+
+  useEffect(() => {
+    const screenContent = screenContentRef.current;
+
+    if (!screenContent) {
+      return;
+    }
+
+    screenContent.scrollTop = 0;
+    screenContent.scrollLeft = 0;
+  }, [activePack.id, activeView, questionIndex]);
 
   function startPack(packId: string) {
     const completedAttempts = isComplete
@@ -394,17 +428,30 @@ export function QuizExperience() {
           </div>
         </section>
 
-        <div className="screen-content">
+        <div className="screen-content" ref={screenContentRef}>
           {activeView === "home" ? (
             <LocalHomeScreen
               activePack={activePack}
               answeredCount={answeredCount}
               dailyPack={dailyMatchdayPack}
+              dailyStatus={dailyMatchdayStatus}
               fixture={scheduledPredictionFixture}
               isComplete={isComplete}
               localPredictionEntry={localPredictionEntry}
               nextPack={nextHomePack}
               onNavigate={setActiveView}
+              onOpenDailyQuiz={() => {
+                if (!dailyMatchdayPack) {
+                  return;
+                }
+
+                if (dailyMatchdayStatus?.quizAction === "open") {
+                  setActiveView("play");
+                  return;
+                }
+
+                startPack(dailyMatchdayPack.id);
+              }}
               onStartPack={startPack}
               profileSummary={localProfileSummary}
               savedPrediction={predictionUi.savedPrediction}
@@ -886,6 +933,7 @@ interface LocalHomeScreenProps {
   activePack: QuizPack;
   answeredCount: number;
   dailyPack?: QuizPack;
+  dailyStatus?: DailyMatchdayStatus;
   fixture?: PredictionFixture;
   isComplete: boolean;
   localPredictionEntry?: PredictionLeagueEntry;
@@ -894,6 +942,7 @@ interface LocalHomeScreenProps {
   savedPrediction?: ScorePrediction;
   totalQuestions: number;
   onNavigate: (view: AppView) => void;
+  onOpenDailyQuiz: () => void;
   onStartPack: (packId: string) => void;
 }
 
@@ -901,6 +950,7 @@ function LocalHomeScreen({
   activePack,
   answeredCount,
   dailyPack,
+  dailyStatus,
   fixture,
   isComplete,
   localPredictionEntry,
@@ -909,6 +959,7 @@ function LocalHomeScreen({
   savedPrediction,
   totalQuestions,
   onNavigate,
+  onOpenDailyQuiz,
   onStartPack,
 }: LocalHomeScreenProps) {
   const quizProgressLabel = isComplete
@@ -963,8 +1014,9 @@ function LocalHomeScreen({
           fixture={fixture}
           pack={dailyPack}
           savedPrediction={savedPrediction}
+          status={dailyStatus}
           onPredict={() => onNavigate("leaderboard")}
-          onStart={() => onStartPack(dailyPack.id)}
+          onStart={onOpenDailyQuiz}
         />
       ) : null}
 
@@ -1010,12 +1062,14 @@ function DailyMatchdayPanel({
   fixture,
   pack,
   savedPrediction,
+  status,
   onPredict,
   onStart,
 }: {
   fixture?: PredictionFixture;
   pack: QuizPack;
   savedPrediction?: ScorePrediction;
+  status?: DailyMatchdayStatus;
   onPredict: () => void;
   onStart: () => void;
 }) {
@@ -1031,6 +1085,11 @@ function DailyMatchdayPanel({
     savedPrediction && fixture
       ? `${savedPrediction.score.home}-${savedPrediction.score.away}`
       : "Pick";
+  const quizActionLabel = status?.quizActionLabel ?? "Quiz";
+  const quizButtonLabel =
+    quizActionLabel === "Quiz"
+      ? `Start ${pack.title}`
+      : `${quizActionLabel} ${pack.title}`;
 
   return (
     <section className="daily-matchday-card" aria-label="Daily Matchday">
@@ -1038,16 +1097,27 @@ function DailyMatchdayPanel({
         <span>Daily Matchday</span>
         <h3>{fixtureLabel}</h3>
         <p>{fixtureMeta}</p>
+        <div
+          className="daily-matchday-status"
+          aria-label="Daily Matchday checklist"
+        >
+          <span className={status?.quizComplete ? "complete" : ""}>
+            {status?.quizStatusLabel ?? "Quiz pending"}
+          </span>
+          <span className={savedPrediction ? "complete" : ""}>
+            {savedPrediction ? "Pick saved" : "Pick pending"}
+          </span>
+        </div>
       </div>
       <div className="daily-matchday-actions">
         <button
-          aria-label={`Start ${pack.title}`}
+          aria-label={quizButtonLabel}
           className="daily-matchday-button primary"
           onClick={onStart}
           type="button"
         >
           <Play aria-hidden="true" size={15} />
-          Quiz
+          {quizActionLabel}
         </button>
         <button
           aria-label="Predict score"
@@ -1352,6 +1422,54 @@ function PredictionCompletionCard({
       </button>
     </section>
   );
+}
+
+function buildDailyMatchdayStatus({
+  activePack,
+  answers,
+  completedAttempts,
+  dailyPack,
+  isComplete,
+}: {
+  activePack: QuizPack;
+  answers: AnswerMap;
+  completedAttempts: LocalQuizAttempt[];
+  dailyPack: QuizPack;
+  isComplete: boolean;
+}): DailyMatchdayStatus {
+  const isActiveDailyPack = activePack.id === dailyPack.id;
+  const completedEarlier = completedAttempts.some(
+    (attempt) => attempt.packId === dailyPack.id,
+  );
+
+  if ((isActiveDailyPack && isComplete) || completedEarlier) {
+    return {
+      quizAction: isActiveDailyPack && isComplete ? "open" : "start",
+      quizActionLabel: isActiveDailyPack && isComplete ? "Review" : "Replay",
+      quizComplete: true,
+      quizStatusLabel: "Quiz done",
+    };
+  }
+
+  if (isActiveDailyPack) {
+    const answeredDailyCount = Object.keys(answers).length;
+
+    if (answeredDailyCount > 0) {
+      return {
+        quizAction: "open",
+        quizActionLabel: "Continue",
+        quizComplete: false,
+        quizStatusLabel: `${answeredDailyCount}/${dailyPack.questions.length} answered`,
+      };
+    }
+  }
+
+  return {
+    quizAction: "start",
+    quizActionLabel: "Quiz",
+    quizComplete: false,
+    quizStatusLabel: "Quiz pending",
+  };
 }
 
 interface LocalProfileSummary {

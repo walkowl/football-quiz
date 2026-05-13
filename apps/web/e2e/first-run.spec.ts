@@ -160,6 +160,12 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(
     page.getByRole("region", { name: "Daily Matchday" }),
   ).toContainText("Pick 2-1");
+  await expect(page.getByLabel("Daily Matchday checklist")).toContainText(
+    "Quiz pending",
+  );
+  await expect(page.getByLabel("Daily Matchday checklist")).toContainText(
+    "Pick saved",
+  );
 
   await page.reload();
   await page.getByRole("button", { name: "Leaderboard" }).tap();
@@ -296,6 +302,12 @@ test("home daily matchday routes into quiz and prediction", async ({
   const dailyMatchday = page.getByRole("region", { name: "Daily Matchday" });
   await expect(dailyMatchday).toContainText("NAP vs INT");
   await expect(dailyMatchday).toContainText("Serie A / Mock week 2");
+  await expect(
+    dailyMatchday.getByLabel("Daily Matchday checklist"),
+  ).toContainText("Quiz pending");
+  await expect(
+    dailyMatchday.getByLabel("Daily Matchday checklist"),
+  ).toContainText("Pick pending");
   await expect(page.locator(".phone-frame")).toHaveScreenshot(
     "phone-home-hub.png",
     {
@@ -328,6 +340,19 @@ test("home daily matchday routes into quiz and prediction", async ({
   await expect(handoff).toContainText(
     "Use the quiz read to make a local score pick.",
   );
+
+  await page.getByRole("button", { name: "Home" }).tap();
+  await expect(
+    dailyMatchday.getByLabel("Daily Matchday checklist"),
+  ).toContainText("Quiz done");
+  await expect(
+    dailyMatchday.getByLabel("Daily Matchday checklist"),
+  ).toContainText("Pick pending");
+
+  await dailyMatchday
+    .getByRole("button", { name: "Review Daily Matchday" })
+    .tap();
+  await expect(handoff).toContainText("NAP vs INT");
 
   await handoff
     .getByRole("button", { name: "Predict Napoli vs Inter score" })
