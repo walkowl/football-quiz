@@ -1553,6 +1553,83 @@ button {
   line-height: 1.25;
 }
 
+.prediction-complete-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(29, 184, 102, 0.38);
+  border-radius: 15px;
+  background:
+    linear-gradient(135deg, rgba(29, 184, 102, 0.16), transparent 60%),
+    rgba(255, 255, 255, 0.055);
+  padding: 10px 12px;
+}
+
+.prediction-complete-card span,
+.prediction-complete-card strong,
+.prediction-complete-card p {
+  display: block;
+  margin: 0;
+}
+
+.prediction-complete-card span {
+  color: #8cffbd;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prediction-complete-card strong {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-complete-card p {
+  overflow: hidden;
+  margin-top: 4px;
+  color: rgba(246, 244, 238, 0.58);
+  font-size: 0.66rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-complete-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(29, 184, 102, 0.58);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: #9dffc8;
+  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 900;
+  padding: 7px 9px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+  white-space: nowrap;
+}
+
+.prediction-complete-button:hover,
+.prediction-complete-button:focus-visible {
+  border-color: rgba(29, 184, 102, 0.92);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .prediction-panel {
   display: grid;
   gap: 11px;

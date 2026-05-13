@@ -416,6 +416,7 @@ export function QuizExperience() {
               fixture={scheduledPredictionFixture}
               localPredictionEntry={localPredictionEntry}
               lockState={scheduledPredictionLockState}
+              onOpenHome={() => setActiveView("home")}
               onDraftChange={(draft) =>
                 setPredictionUiOverride({
                   ...predictionUi,
@@ -1022,7 +1023,9 @@ function DailyMatchdayPanel({
     ? `${fixture.homeTeam.shortName} vs ${fixture.awayTeam.shortName}`
     : "Fixture pending";
   const fixtureMeta = fixture
-    ? `${fixture.competition} / ${fixture.matchday}`
+    ? savedPrediction
+      ? `${fixture.competition} / Pick ${savedPrediction.score.home}-${savedPrediction.score.away}`
+      : `${fixture.competition} / ${fixture.matchday}`
     : "Mock fixture";
   const pickLabel =
     savedPrediction && fixture
@@ -1105,6 +1108,7 @@ interface PredictionLeagueScreenProps {
   savedPrediction?: ScorePrediction;
   onClear: () => void;
   onDraftChange: (score: ScoreLine) => void;
+  onOpenHome: () => void;
   onSave: () => void;
 }
 
@@ -1118,6 +1122,7 @@ function PredictionLeagueScreen({
   savedPrediction,
   onClear,
   onDraftChange,
+  onOpenHome,
   onSave,
 }: PredictionLeagueScreenProps) {
   const predictionLocked = lockState?.status === "locked";
@@ -1169,6 +1174,14 @@ function PredictionLeagueScreen({
           <p>{standingCopy}</p>
         </div>
       </section>
+
+      {fixture && savedPrediction ? (
+        <PredictionCompletionCard
+          fixture={fixture}
+          prediction={savedPrediction}
+          onOpenHome={onOpenHome}
+        />
+      ) : null}
 
       <section className="prediction-panel" aria-label="Upcoming prediction">
         <div className="prediction-panel-header">
@@ -1303,6 +1316,40 @@ function PredictionLeagueScreen({
           ))}
         </div>
       </section>
+    </section>
+  );
+}
+
+function PredictionCompletionCard({
+  fixture,
+  prediction,
+  onOpenHome,
+}: {
+  fixture: PredictionFixture;
+  prediction: ScorePrediction;
+  onOpenHome: () => void;
+}) {
+  return (
+    <section
+      className="prediction-complete-card"
+      aria-label="Matchday pick complete"
+    >
+      <div>
+        <span>Matchday action done</span>
+        <strong>
+          {fixture.homeTeam.shortName} {prediction.score.home}-
+          {prediction.score.away} {fixture.awayTeam.shortName}
+        </strong>
+        <p>Saved locally for {fixture.matchday}.</p>
+      </div>
+      <button
+        className="prediction-complete-button"
+        onClick={onOpenHome}
+        type="button"
+      >
+        <Home aria-hidden="true" size={15} />
+        Review Home
+      </button>
     </section>
   );
 }

@@ -253,6 +253,18 @@ describe("QuizExperience", () => {
     expect(screen.getByLabelText("Standing")).toHaveTextContent("Pending");
     expect(screen.getByText("Pending result.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "You" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Matchday pick complete")).toHaveTextContent(
+      "NAP 2-1 INT",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Review Home" }));
+
+    expect(
+      screen.getByRole("heading", { name: "Matchday Hub" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Daily Matchday" }),
+    ).toHaveTextContent("Pick 2-1");
   });
 
   it("opens the local profile tab with quiz and prediction state", () => {
@@ -462,9 +474,11 @@ describe("QuizExperience", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));
 
-    expect(screen.getByRole("dialog")).toHaveTextContent("Controls");
+    const settingsDialog = screen.getByRole("dialog");
+
+    expect(settingsDialog).toHaveTextContent("Controls");
     expect(screen.getByText("Mock")).toBeInTheDocument();
-    expect(screen.getByText("NAP 2-1 INT")).toBeInTheDocument();
+    expect(within(settingsDialog).getByText("NAP 2-1 INT")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Reset data" }));
 

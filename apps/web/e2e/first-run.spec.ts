@@ -147,8 +147,19 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(page.getByText("Pending result.")).toBeVisible();
   await expect(page.getByRole("heading", { name: "You" })).toBeVisible();
   await expect(
+    page.getByRole("region", { name: "Matchday pick complete" }),
+  ).toContainText("NAP 2-1 INT");
+  await expect(
     page.getByText(/\b(bet|betting|odds|wager|payout|cash)\b/i),
   ).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Review Home" }).tap();
+  await expect(
+    page.getByRole("heading", { name: "Matchday Hub" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Daily Matchday" }),
+  ).toContainText("Pick 2-1");
 
   await page.reload();
   await page.getByRole("button", { name: "Leaderboard" }).tap();
@@ -220,8 +231,9 @@ test("local settings can reset device-only state", async ({ page }) => {
 
   await page.getByRole("button", { name: "Settings" }).tap();
 
-  await expect(page.getByRole("dialog", { name: "Controls" })).toBeVisible();
-  await expect(page.getByText("NAP 2-1 INT")).toBeVisible();
+  const controls = page.getByRole("dialog", { name: "Controls" });
+  await expect(controls).toBeVisible();
+  await expect(controls.getByText("NAP 2-1 INT")).toBeVisible();
   await page.getByRole("button", { name: "Reset data" }).tap();
 
   await expect(page.getByRole("dialog")).toHaveCount(0);
