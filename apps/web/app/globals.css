@@ -738,6 +738,85 @@ button {
   text-transform: uppercase;
 }
 
+.matchday-handoff-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(29, 184, 102, 0.34);
+  border-radius: 13px;
+  background:
+    linear-gradient(135deg, rgba(29, 184, 102, 0.14), transparent 62%),
+    rgba(255, 255, 255, 0.055);
+  padding: 10px;
+}
+
+.matchday-handoff-card span,
+.matchday-handoff-card strong,
+.matchday-handoff-card p {
+  display: block;
+  margin: 0;
+}
+
+.matchday-handoff-card span {
+  color: #8cffbd;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.matchday-handoff-card strong {
+  overflow: hidden;
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 950;
+  line-height: 1.08;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matchday-handoff-card p {
+  overflow: hidden;
+  margin-top: 4px;
+  color: rgba(246, 244, 238, 0.58);
+  font-size: 0.66rem;
+  font-weight: 720;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matchday-handoff-button {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(217, 121, 55, 0.7);
+  border-radius: 999px;
+  background: var(--amber);
+  color: #17110c;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 7px 10px;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+  white-space: nowrap;
+}
+
+.matchday-handoff-button:hover,
+.matchday-handoff-button:focus-visible {
+  border-color: rgba(255, 190, 122, 0.95);
+  background: #efa15e;
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .personalize-header {
   display: flex;
   align-items: center;

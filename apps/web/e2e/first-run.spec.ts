@@ -302,8 +302,24 @@ test("home daily matchday routes into quiz and prediction", async ({
     }),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: "Home" }).tap();
-  await page.getByRole("button", { name: "Predict score" }).tap();
+  await page.getByRole("button", { name: "Title-race pressure" }).tap();
+  await page.getByRole("button", { name: /Next question/ }).tap();
+  await page.getByRole("button", { name: "Recent chance creation" }).tap();
+  await page.getByRole("button", { name: /Next question/ }).tap();
+  await page.getByRole("button", { name: "Outcome plus margin" }).tap();
+  await page.getByRole("button", { name: /Reveal profile/ }).tap();
+
+  const handoff = page.getByRole("region", {
+    name: "Matchday prediction handoff",
+  });
+  await expect(handoff).toContainText("NAP vs INT");
+  await expect(handoff).toContainText(
+    "Use the quiz read to make a local score pick.",
+  );
+
+  await handoff
+    .getByRole("button", { name: "Predict Napoli vs Inter score" })
+    .tap();
   await expect(
     page.getByRole("heading", { name: "Score League" }),
   ).toBeVisible();

@@ -354,6 +354,50 @@ describe("QuizExperience", () => {
     ).toBeInTheDocument();
   });
 
+  it("hands off a completed Daily Matchday quiz to score prediction", () => {
+    render(<QuizExperience />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Home" }));
+    fireEvent.click(
+      within(screen.getByRole("region", { name: "Daily Matchday" })).getByRole(
+        "button",
+        { name: "Start Daily Matchday" },
+      ),
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Title-race pressure" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Recent chance creation" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Next question/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Outcome plus margin" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Reveal profile/ }));
+
+    const handoff = screen.getByRole("region", {
+      name: "Matchday prediction handoff",
+    });
+
+    expect(handoff).toHaveTextContent("NAP vs INT");
+    expect(handoff).toHaveTextContent(
+      "Use the quiz read to make a local score pick.",
+    );
+
+    fireEvent.click(
+      within(handoff).getByRole("button", {
+        name: "Predict Napoli vs Inter score",
+      }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Score League" }),
+    ).toBeInTheDocument();
+  });
+
   it("updates and clears a local score prediction", () => {
     render(<QuizExperience />);
 

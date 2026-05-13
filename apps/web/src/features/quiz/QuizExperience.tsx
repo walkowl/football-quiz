@@ -492,10 +492,13 @@ export function QuizExperience() {
           ) : (
             <ResultCard
               activePack={activePack}
+              fixture={scheduledPredictionFixture}
               localPackIds={localPackIds}
+              savedPrediction={predictionUi.savedPrediction}
               onRestart={restart}
               onStartPack={startPack}
               onToggleTopic={toggleTopic}
+              onOpenPrediction={() => setActiveView("leaderboard")}
               playerBenchmark={playerBenchmark}
               profile={fanProfile}
               outcome={outcome}
@@ -703,11 +706,14 @@ function QuestionDataBadges({
 
 interface ResultCardProps {
   activePack: QuizPack;
+  fixture?: PredictionFixture;
   localPackIds: ReadonlySet<string>;
   outcome: ReturnType<typeof evaluateQuiz>;
   playerBenchmark: PlayerBenchmark;
   profile: ReturnType<typeof buildFanProfile>;
+  savedPrediction?: ScorePrediction;
   selectedTopics: string[];
+  onOpenPrediction: () => void;
   onRestart: () => void;
   onStartPack: (packId: string) => void;
   onToggleTopic: (topicId: string) => void;
@@ -715,16 +721,20 @@ interface ResultCardProps {
 
 function ResultCard({
   activePack,
+  fixture,
   localPackIds,
   outcome,
   playerBenchmark,
   profile,
+  savedPrediction,
   selectedTopics,
+  onOpenPrediction,
   onRestart,
   onStartPack,
   onToggleTopic,
 }: ResultCardProps) {
   const packs = recommendPacks(profile);
+  const isDailyMatchday = activePack.id === "daily-matchday";
 
   return (
     <section className="result-card" aria-label="Quiz result">
@@ -759,6 +769,14 @@ function ResultCard({
           <span className="profile-label">strongest signal</span>
         </div>
       </div>
+
+      {isDailyMatchday ? (
+        <MatchdayPredictionHandoff
+          fixture={fixture}
+          savedPrediction={savedPrediction}
+          onOpenPrediction={onOpenPrediction}
+        />
+      ) : null}
 
       <div className="personalize-header">
         <Flame aria-hidden="true" size={18} />
@@ -816,6 +834,49 @@ function ResultCard({
           );
         })}
       </div>
+    </section>
+  );
+}
+
+function MatchdayPredictionHandoff({
+  fixture,
+  savedPrediction,
+  onOpenPrediction,
+}: {
+  fixture?: PredictionFixture;
+  savedPrediction?: ScorePrediction;
+  onOpenPrediction: () => void;
+}) {
+  const fixtureLabel = fixture
+    ? `${fixture.homeTeam.shortName} vs ${fixture.awayTeam.shortName}`
+    : "Fixture pending";
+  const buttonLabel = fixture
+    ? `Predict ${fixture.homeTeam.name} vs ${fixture.awayTeam.name} score`
+    : "Predict score";
+  const predictionCopy =
+    savedPrediction && fixture
+      ? `Saved ${savedPrediction.score.home}-${savedPrediction.score.away} locally.`
+      : "Use the quiz read to make a local score pick.";
+
+  return (
+    <section
+      className="matchday-handoff-card"
+      aria-label="Matchday prediction handoff"
+    >
+      <div>
+        <span>Next action</span>
+        <strong>{fixtureLabel}</strong>
+        <p>{predictionCopy}</p>
+      </div>
+      <button
+        aria-label={buttonLabel}
+        className="matchday-handoff-button"
+        onClick={onOpenPrediction}
+        type="button"
+      >
+        <BarChart3 aria-hidden="true" size={15} />
+        {savedPrediction ? "Update pick" : "Predict"}
+      </button>
     </section>
   );
 }
