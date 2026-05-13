@@ -24,7 +24,7 @@ The gate currently checks:
 - TypeScript strict type checking.
 - Architecture boundary rules.
 - Vitest unit and component tests.
-- Mock football-data contract checks for media paths, media size, fixture dates, final scores, and prediction/member links.
+- Mock football-data contract checks for media paths, media size, source metadata, normalized entity references, fixture dates, final scores, and prediction/member links.
 - Coverage thresholds.
 - Playwright mobile browser E2E tests.
 - Playwright visual regression screenshot for the approved mobile phone frame.

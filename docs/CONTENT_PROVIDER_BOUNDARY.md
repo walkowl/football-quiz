@@ -21,6 +21,7 @@ Provider-specific code should eventually live behind a content ingestion boundar
 - Explanation.
 - Difficulty.
 - Tags.
+- Normalized entity references for fixtures, teams, players, competitions, and topics.
 - Source attribution.
 - Freshness and expiry.
 - Optional media.
@@ -49,7 +50,7 @@ The quiz screen must show that metadata compactly while the app is using local m
 Required fields:
 
 - Source label.
-- Fetch time when provider data is introduced.
+- Retrieval time.
 - Event time where relevant.
 - Valid-until or expiry rule.
 - Confidence level for rumours or unofficial reports.

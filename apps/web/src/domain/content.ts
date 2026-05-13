@@ -13,3 +13,16 @@ export interface FreshnessMetadata {
   label: string;
   validUntil: string;
 }
+
+export type ContentEntityKind =
+  | "competition"
+  | "fixture"
+  | "player"
+  | "team"
+  | "topic";
+
+export interface ContentEntityRef {
+  kind: ContentEntityKind;
+  id: string;
+  label: string;
+}

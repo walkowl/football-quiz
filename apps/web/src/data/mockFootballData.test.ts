@@ -1,8 +1,8 @@
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import type { DataSource } from "../domain/content";
-import { localMockQuizPacks } from "./mockFootballData";
+import type { ContentEntityRef, DataSource } from "../domain/content";
+import { dailyMatchdayQuizPack, localMockQuizPacks } from "./mockFootballData";
 import {
   mockPredictionFixtures,
   mockPredictionMembers,
@@ -31,6 +31,7 @@ describe("mock football data", () => {
         expect(question.context).not.toHaveLength(0);
         expect(question.explanation).not.toHaveLength(0);
         expectProviderReadyMockSource(question.source);
+        expectNormalizedEntityRefs(question.entityRefs);
         expect(question.freshness.validUntil).not.toHaveLength(0);
 
         if (question.media) {
@@ -70,6 +71,25 @@ describe("mock football data", () => {
     expect(localMockQuizPacks.map((pack) => pack.id)).toEqual(
       expect.arrayContaining(["weekly-pulse", "daily-matchday"]),
     );
+  });
+
+  it("links Daily Matchday quiz questions to the scheduled fixture", () => {
+    const scheduledFixture = mockPredictionFixtures.find(
+      (fixture) => fixture.status === "scheduled",
+    );
+
+    expect(scheduledFixture).toBeDefined();
+
+    for (const question of dailyMatchdayQuizPack.questions) {
+      expect(question.entityRefs).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            kind: "fixture",
+            id: scheduledFixture?.id,
+          }),
+        ]),
+      );
+    }
   });
 
   it("keeps referenced mock media present, accessible, and lightweight", () => {
@@ -162,4 +182,21 @@ function expectProviderReadyMockSource(source: DataSource) {
   expect(source.label).not.toHaveLength(0);
   expect(source.confidence).toBe("mock");
   expect(Date.parse(source.retrievedAt)).not.toBeNaN();
+}
+
+function expectNormalizedEntityRefs(entityRefs: ContentEntityRef[]) {
+  expect(entityRefs.length).toBeGreaterThan(0);
+  const entityKeys = new Set<string>();
+
+  for (const entityRef of entityRefs) {
+    const entityKey = `${entityRef.kind}:${entityRef.id}`;
+
+    expect(entityKeys.has(entityKey)).toBe(false);
+    entityKeys.add(entityKey);
+    expect(["competition", "fixture", "player", "team", "topic"]).toContain(
+      entityRef.kind,
+    );
+    expect(entityRef.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    expect(entityRef.label).not.toHaveLength(0);
+  }
 }

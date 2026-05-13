@@ -69,7 +69,7 @@ The local mock layer now includes:
 - A device-only profile tab that shows quiz accuracy, answered questions, strongest signals, saved prediction picks, and next-focus packs without accounts or backend storage.
 - Persisted local quiz progress for the active pack, answers, selected topics, and profile state so browser refreshes do not erase the first product loop.
 - A local completed-quiz history so the profile still reflects prior finished packs after the user starts the next quiz.
-- Shared source metadata for mock quiz and fixture data, including source kind, label, retrieval timestamp, and confidence, so a provider adapter can replace mocks without changing UI contracts.
+- Shared source metadata and normalized entity references for mock quiz and fixture data, including source kind, label, retrieval timestamp, confidence, fixtures, teams, players, competitions, and topics, so a provider adapter can replace mocks without changing UI contracts.
 - Local quality checks for mock media paths, media weight, prediction fixtures, fixture dates, final scores, and mock prediction/member links.
 - A device-only local controls sheet for checking mock status and resetting quiz/prediction state during mobile testing.
 

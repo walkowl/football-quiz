@@ -35,6 +35,11 @@ export const mockQuestions: QuizQuestion[] = [
     context: "Mock image-led player ID.",
     freshness: mockWeekFreshness,
     source: localMockSource,
+    entityRefs: [
+      { kind: "player", id: "cristiano-ronaldo", label: "Cristiano Ronaldo" },
+      { kind: "team", id: "portugal", label: "Portugal" },
+      { kind: "topic", id: "player-identification", label: "Player ID" },
+    ],
     media: {
       kind: "image",
       src: "/mock-media/legend-photo.jpeg",
@@ -62,6 +67,11 @@ export const mockQuestions: QuizQuestion[] = [
       validUntil: "Stable",
     },
     source: localMockSource,
+    entityRefs: [
+      { kind: "competition", id: "bundesliga", label: "Bundesliga" },
+      { kind: "team", id: "bayer-leverkusen", label: "Bayer Leverkusen" },
+      { kind: "topic", id: "club-form", label: "Club form" },
+    ],
     media: clubNightMedia,
     options: [
       { id: "dortmund", label: "Borussia Dortmund", hint: "BVB" },
@@ -84,6 +94,10 @@ export const mockQuestions: QuizQuestion[] = [
       validUntil: "Provider required",
     },
     source: localMockSource,
+    entityRefs: [
+      { kind: "topic", id: "market-values", label: "Market values" },
+      { kind: "topic", id: "transfers", label: "Transfers" },
+    ],
     options: [
       {
         id: "young-winger",
@@ -132,6 +146,16 @@ export const weeklyPulseQuizPack: QuizPack = {
       context: "Mock completed match result.",
       freshness: mockWeekFreshness,
       source: localMockSource,
+      entityRefs: [
+        {
+          kind: "fixture",
+          id: "mock-pl-ars-tot-2026-05-09",
+          label: "Arsenal vs Tottenham",
+        },
+        { kind: "competition", id: "premier-league", label: "Premier League" },
+        { kind: "team", id: "arsenal", label: "Arsenal" },
+        { kind: "team", id: "tottenham", label: "Tottenham" },
+      ],
       media: clubNightMedia,
       options: [
         { id: "arsenal", label: "Arsenal", hint: "2-1" },
@@ -151,6 +175,10 @@ export const weeklyPulseQuizPack: QuizPack = {
       context: "Mock normalized player-form signal.",
       freshness: mockWeekFreshness,
       source: localMockSource,
+      entityRefs: [
+        { kind: "topic", id: "player-form", label: "Player form" },
+        { kind: "topic", id: "chance-creation", label: "Chance creation" },
+      ],
       options: [
         {
           id: "wide-forward",
@@ -185,6 +213,15 @@ export const weeklyPulseQuizPack: QuizPack = {
       context: "Mock standings movement.",
       freshness: mockWeekFreshness,
       source: localMockSource,
+      entityRefs: [
+        {
+          kind: "competition",
+          id: "champions-league",
+          label: "Champions League",
+        },
+        { kind: "topic", id: "league-tables", label: "League tables" },
+        { kind: "topic", id: "form", label: "Form" },
+      ],
       media: {
         kind: "image",
         src: "/mock-media/transfer-room.svg",
@@ -233,6 +270,16 @@ export const dailyMatchdayQuizPack: QuizPack = {
       context: "Mock Serie A preview.",
       freshness: mockMatchdayFreshness,
       source: localMockSource,
+      entityRefs: [
+        {
+          kind: "fixture",
+          id: "mock-serie-a-nap-int-2026-05-16",
+          label: "Napoli vs Inter",
+        },
+        { kind: "competition", id: "serie-a", label: "Serie A" },
+        { kind: "team", id: "napoli", label: "Napoli" },
+        { kind: "team", id: "inter", label: "Inter" },
+      ],
       media: clubNightMedia,
       options: [
         {
@@ -269,6 +316,17 @@ export const dailyMatchdayQuizPack: QuizPack = {
       context: "Mock team-form signal.",
       freshness: mockMatchdayFreshness,
       source: localMockSource,
+      entityRefs: [
+        {
+          kind: "fixture",
+          id: "mock-serie-a-nap-int-2026-05-16",
+          label: "Napoli vs Inter",
+        },
+        { kind: "competition", id: "serie-a", label: "Serie A" },
+        { kind: "team", id: "napoli", label: "Napoli" },
+        { kind: "team", id: "inter", label: "Inter" },
+        { kind: "topic", id: "team-form", label: "Team form" },
+      ],
       options: [
         {
           id: "chance-creation",
@@ -307,6 +365,16 @@ export const dailyMatchdayQuizPack: QuizPack = {
         validUntil: "Compliance required before rewards",
       },
       source: localMockSource,
+      entityRefs: [
+        {
+          kind: "fixture",
+          id: "mock-serie-a-nap-int-2026-05-16",
+          label: "Napoli vs Inter",
+        },
+        { kind: "competition", id: "serie-a", label: "Serie A" },
+        { kind: "topic", id: "score-predictions", label: "Score predictions" },
+        { kind: "topic", id: "leaderboards", label: "Leaderboards" },
+      ],
       options: [
         {
           id: "outcome-margin",

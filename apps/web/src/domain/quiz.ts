@@ -1,4 +1,8 @@
-import type { DataSource, FreshnessMetadata } from "./content";
+import type {
+  ContentEntityRef,
+  DataSource,
+  FreshnessMetadata,
+} from "./content";
 
 export type Difficulty = "easy" | "medium" | "advanced";
 
@@ -30,6 +34,7 @@ export interface QuizQuestion {
   context: string;
   freshness: FreshnessMetadata;
   source: DataSource;
+  entityRefs: ContentEntityRef[];
   media?: QuizMedia;
   options: QuizOption[];
   correctOptionId: string;
