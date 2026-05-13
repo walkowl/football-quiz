@@ -1090,11 +1090,18 @@ function DailyMatchdayPanel({
     quizActionLabel === "Quiz"
       ? `Start ${pack.title}`
       : `${quizActionLabel} ${pack.title}`;
+  const completedStepCount =
+    Number(status?.quizComplete) + Number(!!savedPrediction);
 
   return (
     <section className="daily-matchday-card" aria-label="Daily Matchday">
       <div className="daily-matchday-copy">
-        <span>Daily Matchday</span>
+        <div className="daily-matchday-heading">
+          <span>Daily Matchday</span>
+          <strong aria-label="Daily Matchday completion">
+            {completedStepCount}/2 done
+          </strong>
+        </div>
         <h3>{fixtureLabel}</h3>
         <p>{fixtureMeta}</p>
         <div

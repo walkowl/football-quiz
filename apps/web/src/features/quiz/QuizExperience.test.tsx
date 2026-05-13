@@ -268,6 +268,11 @@ describe("QuizExperience", () => {
     expect(
       within(
         screen.getByRole("region", { name: "Daily Matchday" }),
+      ).getByLabelText("Daily Matchday completion"),
+    ).toHaveTextContent("1/2 done");
+    expect(
+      within(
+        screen.getByRole("region", { name: "Daily Matchday" }),
       ).getByLabelText("Daily Matchday checklist"),
     ).toHaveTextContent("Quiz pending");
     expect(
@@ -351,6 +356,9 @@ describe("QuizExperience", () => {
     expect(dailyMatchday).toHaveTextContent("NAP vs INT");
     expect(dailyMatchday).toHaveTextContent("Serie A / Mock week 2");
     expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday completion"),
+    ).toHaveTextContent("0/2 done");
+    expect(
       within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
     ).toHaveTextContent("Quiz pending");
     expect(
@@ -425,6 +433,9 @@ describe("QuizExperience", () => {
       within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
     ).toHaveTextContent("Quiz done");
     expect(
+      within(dailyMatchday).getByLabelText("Daily Matchday completion"),
+    ).toHaveTextContent("1/2 done");
+    expect(
       within(dailyMatchday).getByLabelText("Daily Matchday checklist"),
     ).toHaveTextContent("Pick pending");
 
@@ -453,6 +464,15 @@ describe("QuizExperience", () => {
     expect(
       screen.getByRole("heading", { name: "Score League" }),
     ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Save prediction" }));
+    fireEvent.click(screen.getByRole("button", { name: "Review Home" }));
+
+    expect(
+      within(
+        screen.getByRole("region", { name: "Daily Matchday" }),
+      ).getByLabelText("Daily Matchday completion"),
+    ).toHaveTextContent("2/2 done");
   });
 
   it("updates and clears a local score prediction", () => {

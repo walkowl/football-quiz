@@ -160,6 +160,9 @@ test("prediction league saves a local score on mobile", async ({ page }) => {
   await expect(
     page.getByRole("region", { name: "Daily Matchday" }),
   ).toContainText("Pick 2-1");
+  await expect(page.getByLabel("Daily Matchday completion")).toContainText(
+    "1/2 done",
+  );
   await expect(page.getByLabel("Daily Matchday checklist")).toContainText(
     "Quiz pending",
   );
@@ -303,6 +306,9 @@ test("home daily matchday routes into quiz and prediction", async ({
   await expect(dailyMatchday).toContainText("NAP vs INT");
   await expect(dailyMatchday).toContainText("Serie A / Mock week 2");
   await expect(
+    dailyMatchday.getByLabel("Daily Matchday completion"),
+  ).toContainText("0/2 done");
+  await expect(
     dailyMatchday.getByLabel("Daily Matchday checklist"),
   ).toContainText("Quiz pending");
   await expect(
@@ -343,6 +349,9 @@ test("home daily matchday routes into quiz and prediction", async ({
 
   await page.getByRole("button", { name: "Home" }).tap();
   await expect(
+    dailyMatchday.getByLabel("Daily Matchday completion"),
+  ).toContainText("1/2 done");
+  await expect(
     dailyMatchday.getByLabel("Daily Matchday checklist"),
   ).toContainText("Quiz done");
   await expect(
@@ -360,6 +369,11 @@ test("home daily matchday routes into quiz and prediction", async ({
   await expect(
     page.getByRole("heading", { name: "Score League" }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Save prediction" }).tap();
+  await page.getByRole("button", { name: "Review Home" }).tap();
+  await expect(
+    dailyMatchday.getByLabel("Daily Matchday completion"),
+  ).toContainText("2/2 done");
 });
 
 test("home screen keeps the approved mobile visual direction", async ({
