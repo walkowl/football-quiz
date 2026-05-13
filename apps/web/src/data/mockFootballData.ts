@@ -8,6 +8,8 @@ import type {
 const localMockSource: QuizQuestion["source"] = {
   kind: "mock",
   label: "Local mock data",
+  retrievedAt: "2026-05-12T09:00:00.000Z",
+  confidence: "mock",
 };
 const mockWeekFreshness: QuizQuestion["freshness"] = {
   label: "Mock week",

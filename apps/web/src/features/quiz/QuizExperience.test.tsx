@@ -610,7 +610,12 @@ describe("QuizExperience", () => {
       <QuestionMedia
         category="Market value"
         freshness={{ label: "Mock valuation", validUntil: "Provider required" }}
-        source={{ kind: "mock", label: "Local mock data" }}
+        source={{
+          kind: "mock",
+          label: "Local mock data",
+          retrievedAt: "2026-05-12T09:00:00.000Z",
+          confidence: "mock",
+        }}
       />,
     );
 

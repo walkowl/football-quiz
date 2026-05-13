@@ -37,6 +37,13 @@ const teams = {
   },
 } as const;
 
+const localMockFixtureSource: PredictionFixture["source"] = {
+  kind: "mock",
+  label: "Local mock fixtures",
+  retrievedAt: "2026-05-12T09:00:00.000Z",
+  confidence: "mock",
+};
+
 export const mockPredictionFixtures: PredictionFixture[] = [
   {
     id: "mock-pl-ars-tot-2026-05-09",
@@ -53,10 +60,7 @@ export const mockPredictionFixtures: PredictionFixture[] = [
       away: 1,
     },
     settledAt: "2026-05-09T18:28:00.000Z",
-    source: {
-      kind: "mock",
-      label: "Local mock fixtures",
-    },
+    source: localMockFixtureSource,
     freshness: {
       label: "Mock result",
       validUntil: "Replace before beta",
@@ -77,10 +81,7 @@ export const mockPredictionFixtures: PredictionFixture[] = [
       away: 1,
     },
     settledAt: "2026-05-10T20:58:00.000Z",
-    source: {
-      kind: "mock",
-      label: "Local mock fixtures",
-    },
+    source: localMockFixtureSource,
     freshness: {
       label: "Mock result",
       validUntil: "Replace before beta",
@@ -96,10 +97,7 @@ export const mockPredictionFixtures: PredictionFixture[] = [
     status: "scheduled",
     homeTeam: teams.napoli,
     awayTeam: teams.inter,
-    source: {
-      kind: "mock",
-      label: "Local mock fixtures",
-    },
+    source: localMockFixtureSource,
     freshness: {
       label: "Mock fixture",
       validUntil: "Provider required",

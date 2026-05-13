@@ -1,3 +1,5 @@
+import type { DataSource, FreshnessMetadata } from "./content";
+
 export type Difficulty = "easy" | "medium" | "advanced";
 
 export type KnowledgeLevel =
@@ -26,14 +28,8 @@ export interface QuizQuestion {
   difficulty: Difficulty;
   prompt: string;
   context: string;
-  freshness: {
-    label: string;
-    validUntil: string;
-  };
-  source: {
-    kind: "mock" | "provider";
-    label: string;
-  };
+  freshness: FreshnessMetadata;
+  source: DataSource;
   media?: QuizMedia;
   options: QuizOption[];
   correctOptionId: string;

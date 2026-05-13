@@ -1,6 +1,7 @@
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import type { DataSource } from "../domain/content";
 import { localMockQuizPacks } from "./mockFootballData";
 import {
   mockPredictionFixtures,
@@ -29,7 +30,7 @@ describe("mock football data", () => {
         ).toBe(true);
         expect(question.context).not.toHaveLength(0);
         expect(question.explanation).not.toHaveLength(0);
-        expect(question.source.label).not.toHaveLength(0);
+        expectProviderReadyMockSource(question.source);
         expect(question.freshness.validUntil).not.toHaveLength(0);
 
         if (question.media) {
@@ -107,7 +108,7 @@ describe("mock football data", () => {
         Date.parse(fixture.kickoffAt),
       );
       expect(fixture.source.kind).toBe("mock");
-      expect(fixture.source.label).not.toHaveLength(0);
+      expectProviderReadyMockSource(fixture.source);
       expect(fixture.freshness.validUntil).not.toHaveLength(0);
 
       if (fixture.status === "completed") {
@@ -155,3 +156,10 @@ describe("mock football data", () => {
     }
   });
 });
+
+function expectProviderReadyMockSource(source: DataSource) {
+  expect(source.kind).toBe("mock");
+  expect(source.label).not.toHaveLength(0);
+  expect(source.confidence).toBe("mock");
+  expect(Date.parse(source.retrievedAt)).not.toBeNaN();
+}

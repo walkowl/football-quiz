@@ -1,3 +1,5 @@
+import type { DataSource, FreshnessMetadata } from "./content";
+
 export type MatchStatus =
   | "scheduled"
   | "locked"
@@ -30,14 +32,8 @@ export interface PredictionFixture {
   awayTeam: TeamRef;
   finalScore?: ScoreLine;
   settledAt?: string;
-  source: {
-    kind: "mock" | "provider";
-    label: string;
-  };
-  freshness: {
-    label: string;
-    validUntil: string;
-  };
+  source: DataSource;
+  freshness: FreshnessMetadata;
 }
 
 export interface ScorePrediction {
